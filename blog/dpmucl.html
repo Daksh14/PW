@@ -45,6 +45,7 @@
 
     gtag('config', 'G-94FNY2KKSH');
   </script>
+  <script src="https://swetrix.org/swetrix.js" defer></script>
 </head>
 <body class="bg">
   <header>
@@ -199,5 +200,23 @@ impl _serde::Serialize for E {
       </div>
     </main>
   </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialising the script with the Project ID
+      // you can find in the dashboards
+      swetrix.init('QgzKhY7hDGrm')
+
+      // Tracking page views
+      swetrix.trackViews()
+    })
+  </script>
+
+  <noscript>
+    <img
+      src="https://api.swetrix.com/log/noscript?pid=QgzKhY7hDGrm"
+      alt=""
+      referrerpolicy="no-referrer-when-downgrade"
+    />
+  </noscript>
 </body>
 </html>
