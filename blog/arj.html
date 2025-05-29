@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="description" content="Programming the turtlebot using ros2 and rust" />
+    <meta name="keywords" content="rust, turtlebot3, ros, ros2" />
+    <!-- Open graph -->
+    <meta property="og:title" content="Programming the turtlebot using ros2 and rust" />
+    <meta property="og:description"
+        content="Programming the turtlebot using ros2 and rust" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@weegee970" />
+    <meta name="twitter:creator" content="@weegee970" />
+    <meta name="twitter:title" content="Programming the turtlebot using ros2 and rust" />
+    <meta name="twitter:description"
+        content="Programming the turtlebot using ros2 and rust" />
+    <!-- Google -->
+    <meta name="robots" content="noarchive" />
+
+    <title>Programming the turtlebot using ros2 and rust | MyBlog</title>
+    <!-- Fira Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&display=swap"
+        rel="stylesheet" />
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <!-- CSS File -->
+    <link rel="stylesheet" href="../assets/styles/main.css" />
+
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/solarized-dark.min.css"
+        integrity="sha512-kBHeOXtsKtA97/1O3ebZzWRIwiWEOmdrylPrOo3D2+pGhq1m+1CroSOVErIlsqn1xmYowKfQNVDhsczIzeLpmg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"
+        integrity="sha512-gU7kztaQEl7SHJyraPfZLQCNnrKdaQi5ndOyt4L4UPL/FHDd/uB9Je6KDARIqwnNNE27hnqoWLBq+Kpe4iHfeQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        hljs.highlightAll();
+    </script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-94FNY2KKSH"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-94FNY2KKSH');
+    </script>
+    <script src="https://swetrix.org/swetrix.js" defer></script>
+    <!-- Ad -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7095099642760579"
+        crossorigin="anonymous"></script>
+</head>
+
+<body class="bg">
+    <header>
+        <div class="parent container-lg">
+            <div class="left-part">
+                <p class="no-margin-padding">dakshu.xyz</p>
+            </div>
+        </div>
+    </header>
+    <div class="container-lg bg">
+        <main>
+            <div class="blog-post">
+                <div>
+                    <p class="date">
+                        <- <a href="./" class="underline"><span class="color-6">MyBlog</span></a>
+                    </p>
+                    <p class="date"><span class="color-2">28th May, 2025</span></p>
+                    <p class="duration"><span class="color-4">10 min read</span></p>
+                    <p class="heading">
+                        <span class="color-7">A ros2 journey</span>
+                    </p>
+                    <hr />
+                    <p class="content">
+                        For our capstone project we were tasked with programming 3 sets of turtlebot3, you can <a
+                            class="color-7 underline"
+                            href="https://emanual.robotis.com/docs/en/platform/turtlebot3/overview/">find the manual
+                            here.</a><br>
+
+                        There are 2 types, we were working with the BURGER turtlebot3. You can notice the lidar on top
+                        of the robot,
+                        it spins and makes a noise when the robot is turned on.
+                    </p>
+                    <p class="content">
+                        Our professor wanted us to use ros jazzy and were sure about the turtlebot supporting it so we
+                        started using Ubuntu Noble 24.x and installing ros on it, after that you can install python now
+                        and use the
+                        ros2 package or write a C++/C project
+                    </p>
+                    <p class="content">
+                        The class requirements (rescue bot)<br />
+                    <ul>
+                        <li>Robot moving autonomously avoiding obstacles and able to manuver itself through cones</li>
+                        <li>Detection of object of interest using the camera, aka the object to rescue</li>
+                        <li>Broadcast status to other turtlebots and act on it (swarm algorithm)</li>
+                    </ul>
+                    As an experiment, I decided to implement this in rust, my motivation was to
+                    <ul>
+                        <li>Statically link dependencies into one binary which can be run on the bots computer
+                            seamlessly</li>
+                        <li>Leverage rust's fearless concurrency to achieve fast reaction times from sensors while
+                            preventing data races</li>
+                        <li>Less memory footprint compared to Python/Go</li>
+                    </ul>
+                    Using the following crates
+                    </p>
+                    <pre><code class="language-toml">r2r = "0.9" # async rust bindings for ROS2
+tokio = { version = "1", features = ["full"] } # async
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+futures = "0.3.31"
+usls = { version = "0.0.20", default-features = false } # yolov8 inference
+nokhwa = { version = "0.10.7", features = ["input-native", "output-threaded"] } # webcam capture library
+image = "0.25.6" # imgae processing
+anyhow = "1.0.97" 
+ort = "2.0.0-rc.9" # onnix runtime
+rand = "0.9.0"
+async_cell = "0.2.2"
+
+</code></pre>
+                    <h1>ros2 node and topics</h1>
+                    <p class="content">A ros2 node allows us to send/get information from these "topics" which are
+                        initialized when the turtlebot is brought up to life by running the initialization script </p>
+                    <pre><code class="language-plaintext">ros2 launch turtlebot3_bringup robot.launch.py</code></pre>
+                    <p class="content">To check if the bot is initialized correctly run</p>
+                    <pre><code class="language-plaintext">ros2 topic list</code></pre>
+                    <p class="content">
+                        And you should see the <code>/cmd_vel</code> topic and <code>/scan</code> lidar scan topic
+                    </p>
+                    <p class="content">
+                        We are able to construct a node given a name using the following function
+                    </p>
+                    <pre><code class="language-rust">
+pub type Node = Arc&lt;Mutex&lt;r2r::Node&gt;&gt;;
+
+// generate a node with a given name and namespace is set to turtlemove
+pub fn generate_node(name: &str) -> r2r::Result&lt;Node&gt; {
+    let name_space = "turtlemove";
+    let ctx = r2r::Context::create()?;
+    let node = r2r::Node::create(ctx, name, name_space)?;
+    let mutex = Mutex::new(node);
+    let arc = Arc::new(mutex);
+
+    Ok(arc)
+}
+</code>
+</pre>
+                    <p class="content">
+                        Followed by us constructing 2 nodes,
+                    <ul>
+                        <li>
+                            one for navigation, to send <code>Twist</code> msg to <code>/cmd_vel</code> and subscribe to
+                            <code>/odom</code> odometer data and provide it to the navigation process
+                        </li>
+                        <li>
+                            one for lidar, to subscribe to <code>/scan</code> topic and process lidar data and give it
+                            to the nav process so it can react on it
+                        </li>
+                    </ul>
+                    </p>
+                    <pre>
+<code class="language-rust hljs">let lidar_node = generate_node("lidar_node")?;
+
+// Launch the lidar communication channel
+// async cell is used to create a callback from a future 
+let cell_lidar = AsyncCell::shared();
+let weak_lidar = cell_lidar.take_weak();
+
+let lidar_cl = Arc::clone(&lidar_node);
+// lidar process
+tokio::spawn(async move {
+    let mut lidar_node_sub = {
+        let mut lock = lidar_cl.lock().expect("failed to lock lidar node");
+        // subscribe to lidar node
+        let qos = QosProfile::default().best_effort();
+
+        lock.subscribe("/scan", qos)
+            .expect("Subscribing to lidar should work")
+    };
+
+    lidar::lidar_scan(&mut lidar_node_sub, cell_lidar).await;
+});
+</code>
+</pre>
+                    <p class="content">
+                        The <code>lidar_scan</code> processes the <code>LaserScan</code> data and converts it to meaningful directions the nav module can interpert.
+                    </p>
+                    <pre><code class="language-rust">
+let nav_node = generate_node("nav_node")?;
+
+let (yolo_tx, yolo_rx) = mpsc::channel::<XyXy>(1000);
+
+let config_cl = config.clone();
+// camera process + yolo detect
+// having a on async process in between async processes is fine and I confired it in the rust discord with devs, if it doesn't block it should be fine, it definitely isn't recognized by tokio's runtime's exector to include it in its runtime
+std::thread::spawn(move || {
+    let cam = camera::cam_plus_yolo_detect(yolo_tx, config_cl);
+    println!("{:?}", cam)
+});
+// There isn't a async way to do video capture yet, maybe with io_uring and ring buffers ?</code>
+</pre>
+                    <p class="content">
+                        And finally we have the navigation process and our last operation which blocks the application is the spinning of both the nodes
+                        
+                    </p>
+                    <pre>
+<code class="language-rust hljs">// Odometer process
+tokio::spawn(async move {
+    let mut odom_node_sub = {
+        let mut lock = cl.lock().expect("Locking the nav node should work");
+        let qos = QosProfile::default();
+        lock.subscribe("/odom", qos)
+            .expect("Subscribing to odom should work")
+    };
+
+    odom::listen(&mut odom_node_sub, cell_odom).await;
+});
+
+// navigation process
+tokio::spawn(async move {
+    // this is what the bot is doing at any point in time
+    let start_sequence = Sequence::RandomMovement;
+
+    let x = nav::move_process(
+        start_sequence,
+        cl,
+        weak_lidar,
+        yolo_rx,
+        weak_odom,
+        config_cl,
+    )
+    .await;
+
+    println!("{:?}", x);
+});
+
+// spin the nodes
+loop {
+    if let Ok(mut nav_handle) = nav_node.lock() {
+        nav_handle.spin_once(node_spin_dur);
+    }
+
+    if let Ok(mut lidar_handle) = lidar_node.lock() {
+        lidar_handle.spin_once(node_spin_dur);
+    }
+}</code>
+</pre>
+<h1>Navigation process</h1>
+<p class="content">
+                            We setup all our AsyncCells and channel receivers so we are able recieve sensor data
+
+                        We setup a UdpSocket to receive another turtlebot's odometer information
+
+</p>
+                    <pre>
+<code class="language-rust hljs">
+// main navigation logic
+pub async fn move_process(
+    // sequence to start the nav move from
+    starting_seq: Sequence,
+    nav_node: crate::Node,
+    // lidar scan async cell
+    lidar_rx: TakeWeak<LaserScan>,
+    // yolo object recv from camera
+    mut yolo_rx: Receiver<XyXy>,
+    // odometer recv
+    odom_rx: TakeWeak<OdomData>,
+    config: ModelConfig,
+) -> Result<()> {
+    // publish twist messages
+    let publisher = TwistPublisher::new(nav_node.clone());
+    // take a random distance step forward
+    let distance_step = Uniform::new(400, 500).expect("Failed to create distance step");
+    // listening for swarm data
+    let socket = UdpSocket::bind("0.0.0.0:8000").await?;
+    // connect a single bot
+    socket.connect(&config.addr[0]).await?;
+    let socket_arc = Arc::new(socket);
+    let s = socket_arc.clone();
+    let sequence_mut = Arc::new(Mutex::new(starting_seq));
+    // respose buffer from a turtlebot navigation process
+    let mut buf = [0; 1024];
+</code>
+</pre>
+                    <p class="content">
+                        Now inside our control loop we do two things
+
+                        <ul>
+                            <li>Try to recieve data from the UdpSocket of another turtlebot and if we do recieve something, we lock on the sequence variable mutex and change it to <code>Swarming</code></li>
+                            <li>Match over the <code>sequence</code> state machine to check what the robot is doing at any time and provide logic for actions</li>
+                        </ul>
+<pre>
+<code class="language-rust hljs">loop {
+    let socket_arc = Arc::clone(&socket_arc);
+    let seq_cl = Arc::clone(&sequence_mut);
+    
+    tokio::spawn(async move {
+        if let Ok(x) = socket_arc.try_recv(&mut buf) {
+            ...
+        }
+    });
+
+    let mut sequence = sequence_mut.lock().await;
+    ..
+</code>
+</pre>
+
+                        <p class="content">The Sequence state machine is as follows</p>
+<pre><code class="language-rust hljs">/// What the bot is doing at any point in time
+pub enum Sequence {
+    // Start randomly moving in x, y direction
+    RandomMovement,
+    // If charm is located, start moving towards it
+    TrackingToCharm,
+    // If swarm instruction is sent track to the swarm
+    Swarming(OdomData),
+    // Stop
+    Stop,
+}
+</code></pre>       
+                    <p class="content">
+                        Now for our RandomMovement clause, our logic looks like this
+                    </p>
+<pre><code>match *sequence {
+    Sequence::RandomMovement => {
+        // move randomly
+        tokio::spawn(nav_move(
+            distance_step.sample(&mut rand::rng()) as f64,
+            0.2,
+            publisher.clone(),
+        ));
+        
+        tokio::select! {
+            lidar = &lidar_rx => {
+                if let Some(scan) = lidar {
+                    let direction = lidar::lidar_data(&scan);
+                    
+                    if direction.north {
+                        nav_move(10.0, -0.2, publisher.clone()).await;
+                        rotate(0.1, publisher.clone(), None).await;
+                    }
+
+                    if direction.north_west {
+                        rotate(2.0, publisher.clone(), None).await;
+                    }
+
+                    if direction.north_east {
+                        rotate(-2.0, publisher.clone(), None).await;
+                    }
+                }
+            }
+            // check yolo reciever
+            yolo = yolo_rx.recv() => {
+                if yolo.is_some() {
+                    *sequence = Sequence::TrackingToCharm;
+                    nav_stop(publisher.clone());
+                }
+            }
+        }
+    }
+    ...    
+</code></pre>
+                    <p class="content">
+                        In the loop, whenever we hit he RandomMovement clause, first we move random distance step forward and then we have a tokio select and two branches
+                        <ul>
+                            <li>
+                                lidar channel receiver, as we receive directions from the lidar channel, we immediately act on them by rotating the bot away from the detected direction, the bot is probably in forward motion while this is happening
+                            </li>
+                            <li>
+                                If we detect an item of interest using and receive something on the yolo camera channel then we change the Sequence and stop the robot
+                            </li>
+                        </ul>
+                    </p>
+                    <p class="content">
+                        This allows the robot to stop itself while its moving randomly and then track itself to the charm or the item of interest
+                    </p>
+                    <video draggable="false" playsinline="" autoplay="" loop="" class="" hash="cxc2w2w" title=""><source type="video/mp4" src="https://i.imgur.com/cxc2w2w.mp4"></video>
+                    <p class="content">
+                        The robot stops because after avoiding the wall, the camera sees the cone and sends info to the channel and then the tokio branch completes, robot stops and starts tracking to charm. 
+                    </p>
+                    <h1>Compiling the binary</h1>
+                    <p class="content">
+                        The turtlebot3 computer is powered by raspberry pi, we can run the bringup script and <code>cargo r</code> to run the simulation
+                        or cross compile the binary if the raspberry pi is not strong enough, this is what we did as the raspberry pis we were using were pi 3 with around 4gb of RAM.
+                    </p>
+                    <p>To cross compile you can use xargo but the problem is the sourcing of ros, you need to source ros before compiling
+                        <ul>
+                            <li>With xargo or normal cargo you would have to install ros in the system you are running cargo/xargo in so it can be only systems ros supports</li>
+                            <li>With a docker image tuned for ros, install rust inside it and cross compile the binary in the docker image and copy the resulting binary to the host, we can then scp the binary or do this whole process in github actions as Continous Development</li>
+                        </ul>
+                    </p>
+                    <h1>WIN</h1>
+                    <p>The docker image works for me on a mac m1, this supports development on virtually any machine that can run docker and rust and doesn't limit you to ros supported devices!</p>
+                    <hr />
+                    <p>Links:</p>
+                    <ul>
+                        <li>
+                            <a class="underline" href="https://github.com/Daksh14/turtlebot3-rust">turtlebot3-rust</a>
+                        </li>
+                        <li>
+                            <a class="underline" href="https://emanual.robotis.com/docs/en/platform/turtlebot3/overview">turtlebot3-manual</a>
+                        </li>
+                    </ul>
+                    <hr />
+                    <div class="footer-blog">
+                        <p class="date">
+                            <- <a href="./" class="underline"><span class="color-6">MyBlog</span></a>
+                        </p>
+                        <p class="duration no-margin-padding">
+                            <span class="color-2">26th May, 2025</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="./assets/scripts/bundle.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialising the script with the Project ID
+            // you can find in the dashboards
+            swetrix.init('QgzKhY7hDGrm');
+
+            // Tracking page views
+            swetrix.trackViews();
+        });
+    </script>
+
+    <noscript>
+        <img src="https://api.swetrix.com/log/noscript?pid=QgzKhY7hDGrm" alt=""
+            referrerpolicy="no-referrer-when-downgrade" />
+    </noscript>
+</body>
+
+</html>
