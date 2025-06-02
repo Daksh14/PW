@@ -369,6 +369,8 @@ main .blog-post pre code {
 }
 main .blog-post video {
   width: 60%;
+  display: block;
+  margin: 0px auto;
 }
 main .blog-post .center {
   text-align: center;
