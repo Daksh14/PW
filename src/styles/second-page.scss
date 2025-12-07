@@ -67,10 +67,10 @@
     }
 
     .octane {
-      background-image: url("https://raw.githubusercontent.com/OctaneWeb/OctaneSite/develop/docs/assets/logo.png");
+      background-image: url("https://avatars.githubusercontent.com/u/65298932");
       background-size: cover;
       border-radius: 20px;
-      background-position: 0% -30%;
+      background-position: 0% 30%;
       background-repeat: no-repeat;
 
       transition: 0.2s all ease;
@@ -80,7 +80,7 @@
       -o-transition: 0.2s all ease;
 
       &:hover {
-          background-position: 0% -15%;
+          background-position: 0% 20%;
       }
 
       .card {

@@ -19,9 +19,7 @@ body {
   color: #fff;
 }
 
-h1,
-h2,
-h3,
+h3, h1,
 h4,
 h5 {
   margin: 0;
@@ -32,9 +30,14 @@ h1 {
   font-size: 200%;
 }
 
+h3 {
+  display: inline-block;
+}
+
 .no-margin-padding {
   margin: 0;
   padding: 0;
+  margin-top: 0 !important;
 }
 
 a {
@@ -163,12 +166,11 @@ header:after {
 
 footer {
   background: #4C566A;
-  padding: 50px;
+  padding: 20px;
 }
 @media (max-width: 700px) {
   footer {
-    padding: 30px;
-    font-size: 10px;
+    text-align: center;
   }
 }
 
@@ -182,6 +184,8 @@ p {
 
 .main-text {
   white-space: nowrap;
+  margin-top: 70px;
+  margin-bottom: 0px;
   font-size: calc(1.775rem + 6.3vw);
   font-weight: 900;
 }
@@ -203,7 +207,7 @@ p {
 @media (max-width: 600px) {
   .main-text {
     font-size: calc(1.425rem + 2.1vw);
-    margin-top: 30%;
+    margin-top: 75px;
   }
 }
 @media (max-width: 600px) and (min-width: 1200px) {
@@ -225,7 +229,6 @@ main .first-page .main-text {
 }
 main .first-page-blog {
   position: relative;
-  top: 20%;
 }
 main .first-page-blog ul {
   list-style-type: "=>  ";
@@ -291,10 +294,10 @@ main .second-page .projects .turtlebot .card:hover {
   background: rgba(76, 86, 106, 0.6);
 }
 main .second-page .projects .octane {
-  background-image: url("https://raw.githubusercontent.com/OctaneWeb/OctaneSite/develop/docs/assets/logo.png");
+  background-image: url("https://avatars.githubusercontent.com/u/65298932");
   background-size: cover;
   border-radius: 20px;
-  background-position: 0% -30%;
+  background-position: 0% 30%;
   background-repeat: no-repeat;
   transition: 0.2s all ease;
   -webkit-transition: 0.2s all ease;
@@ -303,7 +306,7 @@ main .second-page .projects .octane {
   -o-transition: 0.2s all ease;
 }
 main .second-page .projects .octane:hover {
-  background-position: 0% -15%;
+  background-position: 0% 20%;
 }
 main .second-page .projects .octane .card {
   background: rgba(76, 86, 106, 0.8);

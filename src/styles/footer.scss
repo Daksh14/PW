@@ -2,10 +2,9 @@ $bp-1: 700px;
 
 footer {
 	background: $color-1;
-	padding: 50px;
+	padding: 20px;
 
 	@include media-query($bp-1) {
-		padding: 30px;
-		font-size: 10px;
+		text-align: center;
 	}
 }
