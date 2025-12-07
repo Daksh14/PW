@@ -37,7 +37,7 @@ h3 {
 .no-margin-padding {
   margin: 0;
   padding: 0;
-  margin-top: 0 !important;
+  margin-top: 5px !important;
 }
 
 a {
@@ -234,7 +234,7 @@ main .first-page-blog ul {
   list-style-type: "=>  ";
 }
 main .first-page-blog ul li {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 main .second-page {
   height: 100%;
@@ -493,27 +493,21 @@ button {
   }
 }
 
+.spacer {
+  margin-right: 5px;
+}
+
 .underline {
-  display: inline-block;
-  position: relative;
   cursor: pointer;
+  background-image: linear-gradient(white, white);
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  background-position: 0 100%;
+  transition: background-size 0.25s ease-out;
+  display: inline;
 }
-.underline:after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  transform: scaleX(1);
-  height: 1px;
-  bottom: 0;
-  top: 90%;
-  left: 0;
-  background-color: white;
-  transform-origin: bottom right;
-  transition: transform 0.25s ease-out;
-}
-.underline:hover:after {
-  transform: scaleX(0);
-  transform-origin: bottom left;
+.underline:hover {
+  background-size: 0 1px;
 }
 
 .equals {

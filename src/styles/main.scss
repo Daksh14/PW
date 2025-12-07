@@ -117,33 +117,22 @@ button {
       background-position: 400%;
     }
   }
+}
 
+.spacer {
+  margin-right: 5px;
 }
 
 .underline {
-  display: inline-block;
-  position: relative;
   cursor: pointer;
-
-  &:after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    transform: scaleX(1);
-    height: 1px;
-    bottom: 0;
-    top: 90%;
-    left: 0;
-    background-color: white;
-    transform-origin: bottom right;
-    transition: transform 0.25s ease-out;
-  }
-
+  background-image: linear-gradient(white, white);
+  background-repeat: no-repeat;
+  background-size: 100% 1px;     // full width (like scaleX(1))
+  background-position: 0 100%;
+  transition: background-size 0.25s ease-out;
+  display: inline;               //  
   &:hover {
-    &:after {
-      transform: scaleX(0);
-      transform-origin: bottom left;
-    }
+        background-size: 0 1px;
   }
 }
 
