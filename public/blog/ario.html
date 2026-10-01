@@ -317,8 +317,8 @@ error[E0599]: the method `write_all` exists for struct `compio::compio_fs::File`
            which is required by `compio::compio_fs::File: AsyncWriteExt`
 </code></pre>
 
-So this new AsyncWrite isn't letting me just write a buffer to the file descriptor, it needs ownership of the buffer and then 
-gives it back to me later point in time, this is to lock it and protect kernel reading or writing from it.
+Compio's file only implement methods for fixed read and writes, I will need a std cursor abstraction to read it with io-uring. Tokio does a probe read similar to std::fs does.
+We need to give the ownership of the buffer and file desciptor to the runtime and the runtime will return us back the owned values once corresponding completion queue entry is reaped
 <pre><code class="language-rust">
 use std::io::Cursor;
 
