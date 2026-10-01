@@ -141,13 +141,14 @@
                     <p class="content">
                         `epoll` is stable and great for its use case. It will continued to be used for normal scenarios
                          io-uring allows advance workloads and fulfils custom needs. 
-
+</p>
+<p class="content">
                         We dispatch completion check in the `turn` function inside tokio's scheduler for io-uring operations.
 
-                        With io-uring we enter the kernel to do actuak IO work using˚, `io_uring_enter(2)` we can
+                        With io-uring we enter the kernel to do actuak IO work using˚, `io_uring_enter(2)` we can<br>
 
-                        1. Immediately yield back to our runtime and do start doing some other work or
-                        2. Wait until our I/O request is completed before yielding back to the runtime
+                        1. Immediately yield back to our runtime and do start doing some other work or<br>
+                        2. Wait until our I/O request is completed before yielding back to the runtime<br>
 
                         SQ_POLL allows the kernel to spawn a dedicated thread to watch new submissions but 
                         its not recommended to use by default, it carries the trade of a high CPU usage and 
