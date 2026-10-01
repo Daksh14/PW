@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="description" content="Understand blocking vs async Rust. Learn when to use tokio::spawn, spawn_blocking, and std::thread::spawn — and how to avoid stalling the tokio runtime with CPU-bound or synchronous I/O." />
+    <meta name="keywords" content="rust, async rust, blocking, tokio, spawn_blocking, std::thread::spawn, tokio::spawn, futures, tokio-console, sync mutex, async mutex, concurrency, runtime, worker threads" />
+    <meta name="author" content="Dakshu" />
+    <link rel="canonical" href="https://dakshu.xyz/blog/ario.html" />
+    <!-- Open graph -->
+    <meta property="og:title" content="Taking about Asynchronous runtimes with io-uring" />
+    <meta property="og:description" content="completion based IO vs readiness based IO" />
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://dakshu.xyz/blog/ario.html" />
+    <meta property="og:site_name" content="MyBlog" />
+    <meta property="article:published_time" content="2026-03-30" />
+    <meta property="article:author" content="Dakshu" />
+    <meta property="article:tag" content="rust" />
+    <meta property="article:tag" content="async" />
+    <meta property="article:tag" content="tokio" />
+    <meta property="article:tag" content="concurrency" />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@weegee970" />
+    <meta name="twitter:creator" content="@weegee970" />
+    <meta name="twitter:title" content="Taking about Asynchronous runtimes with io-uring" />
+    <meta name="twitter:description" content="completion based IO vs readiness based IO" />
+    <meta name="twitter:url" content="https://dakshu.xyz/blog/ario.html" />
+    <!-- Google -->
+    <meta name="robots" content="index, follow, noarchive" />
+
+    <title>Taking about Asynchronous runtimes with io-uring | MyBlog</title>
+    <!-- Fira Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&display=swap"
+        rel="stylesheet" />
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <!-- CSS File -->
+    <link rel="stylesheet" href="../assets/styles/main.css" />
+
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/solarized-dark.min.css"
+        integrity="sha512-kBHeOXtsKtA97/1O3ebZzWRIwiWEOmdrylPrOo3D2+pGhq1m+1CroSOVErIlsqn1xmYowKfQNVDhsczIzeLpmg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"
+        integrity="sha512-gU7kztaQEl7SHJyraPfZLQCNnrKdaQi5ndOyt4L4UPL/FHDd/uB9Je6KDARIqwnNNE27hnqoWLBq+Kpe4iHfeQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        hljs.highlightAll();
+    </script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-94FNY2KKSH"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-94FNY2KKSH');
+    </script>
+    <script src="https://swetrix.org/swetrix.js" defer></script>
+    <!-- Ad -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7095099642760579"
+        crossorigin="anonymous"></script>
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": "Blocking vs Async Rust: spawn_blocking, tokio::spawn, and OS Threads",
+      "description": "Completion based IO vs Readiness based IO.",
+      "url": "https://dakshu.xyz/blog/ario.html",
+      "datePublished": "2026-03-30",
+      "dateModified": "2026-03-30",
+      "author": {
+        "@type": "Person",
+        "name": "Dakshu",
+        "url": "https://dakshu.xyz"
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "Dakshu",
+        "url": "https://dakshu.xyz"
+      },
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://dakshu.xyz/blog/ario.html"
+      },
+      "keywords": ["rust", "async rust", "blocking", "tokio", "spawn_blocking", "std::thread::spawn", "futures", "concurrency", "tokio-console", "worker threads"],
+      "articleSection": "Technology",
+      "inLanguage": "en-US",
+      "about": [
+        { "@type": "Thing", "name": "Rust programming language" },
+        { "@type": "Thing", "name": "Asynchronous programming" },
+        { "@type": "Thing", "name": "Tokio" },
+        { "@type": "Thing", "name": "Concurrency" }
+      ]
+    }
+    </script>
+</head>
+
+<body class="bg">
+    <header>
+        <div class="parent container-lg">
+            <div class="left-part">
+                <p class="no-margin-padding">dakshu.xyz</p>
+            </div>
+        </div>
+    </header>
+    <div class="container-lg bg">
+        <main>
+            <div class="blog-post">
+                <div>
+                    <p class="date">
+                        <- <a href="/" class="underline"><span class="color-6">MyBlog</span></a>
+                    </p>
+                    <p class="date"><span class="color-2">30th September, 2026</span></p>
+                    <p class="duration"><span class="color-4">8 min read</span></p>
+                    <p class="heading">
+                        <span class="color-7">Blocking and async rust and io-uring</span>
+                    </p>
+                    <hr />
+                    <p class="content">
+                        Reading files / Listening to sockets in userspace programs written in 
+                        linux is done primarily through system calls.
+                    </p>
+                    <p class="content">
+                        `epoll` is a readiness based event notification we have been using, io-uring came in linux
+                        5.1, it works using shared memory mapped ring buffers between the userspace
+                        and kernel-space. To do I/O, "submit" an I/O request to the kernel, after some time, you 
+                        should expect a "completion queue entry" in your ring buffer.
+                    </p>
+                    <p class="content">
+                        `epoll` is stable and great for its use case. It will continued to be used for normal scenarios
+                         io-uring allows advance workloads and fulfils custom needs. 
+
+                        We dispatch completion check in the `turn` function inside tokio's scheduler for io-uring operations.
+
+                        With io-uring we enter the kernel to do actuak IO work using˚, `io_uring_enter(2)` we can
+
+                        1. Immediately yield back to our runtime and do start doing some other work or
+                        2. Wait until our I/O request is completed before yielding back to the runtime
+
+                        SQ_POLL allows the kernel to spawn a dedicated thread to watch new submissions but 
+                        its not recommended to use by default, it carries the trade of a high CPU usage and 
+                        potentially slowing things down.
+                    </p>
+                    <p class="content">
+                        on a Limactl VM
+                        <pre><code class="language-plaintext">
+[lima@lima-default tokio-io-uring]$ uname -a
+Linux lima-default 6.19.10-300.fc44.aarch64 #1 SMP PREEMPT_DYNAMIC Wed Mar 25 17:45:07 UTC 2026 aarch64 GNU/Linux
+</code>
+</pre>
+                        Running strace on a rust tokio file reading project
+
+                        <pre><code class="language-rust">
+
+#[tokio::main]
+async fn main() -> std::io::Result<()> {
+    let path = "example.txt";
+
+    let mut file = File::create(path).await?;
+    file.write_all(b"Hello from Tokio!\n").await?;
+    file.flush().await?;
+    drop(file);
+
+    let mut file = File::open(path).await?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).await?;
+    print!("{contents}");
+
+    Ok(())
+}
+
+
+</code>
+</pre>
+
+Compile with <code>RUSTFLAGS="--cfg tokio_unstable" cargo b --release</code> and strace shows 
+<pre><code class="language-rust">
+[lima@lima-default tokio-io-uring]$ strace ./target/release/tokio-io-uring
+// initalize io-uring in tokio 
+io_uring_setup(256, {flags=0, ... })
+mmap(NULL, 16384, PROT_R, ... )
+mmap(NULL, 16384, PROT_R, ...)
+io_uring_register(6, IORIN ...)
+
+// register fd to watch 
+epoll_ctl(5, EPOLL_CTL_ADD, 6, ... )
+// enter kernel
+io_uring_enter(6, 1, 0, 0, NULL, 128)   = 1
+futex(0xaaab0a14d3a0, ...) = 0
+mmap(NULL, 2162688, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0xffffbcb83000
+madvise(0xffffbcb83000, 65536, MADV_GUARD_INSTALL) = 0
+rt_sigprocmask(SIG_BLOCK, ~[], [], 8)   = 0
+clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0xffffbcd924e8, parent_tid=0xffffbcd92190, exit
+_signal=0, stack=0xffffbcb83000, stack_size=0x20e9a0, tls=0xffffbcd927e0} => {parent_tid=[18539]}, 88) = 18539
+rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+futex(0xaaab0a144f90, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xaaab0a14d3a0, FUTEX_WAIT_BITSET_PRIVATE, 1, NULL, FUTEX_BITSET_MATCH_ANY) = 0
+close(7)                                = 0
+io_uring_enter(6, 1, 0, 0, NULL, 128)   = 1
+futex(0xaaab0a14a918, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xaaab0a14a298, FUTEX_WAKE_PRIVATE, 1) = 1
+futex(0xaaab0a14d3a0, FUTEX_WAIT_BITSET_PRIVATE, 2, NULL, FUTEX_BITSET_MATCH_ANY) = 0
+write(4, "\1\0\0\0\0\0\0\0", 8)         = 8
+write(1, "Hello from Tokio!\n", 18Hello from Tokio!)     = 18
+close(7)                                = 0
+write(4, "\1\0\0\0\0\0\0\0", 8)         = 8
+</code>
+</pre>
+
+                    In tokio we have managed to mix epoll which is a readiness based API and io-uring 
+                    which is a completion based API. Why so?
+                    </p>
+
+                    <p class="content">
+                        Tokio works on a layer of abstraction higher than `mio`. MIO is lightweight
+                        a deterministic set of code that interfaces with different operating systems
+                        and even notification mechanim supported by the OS. The tokio runtime `Handle` then keeps
+                        an instance of Poll from MIO in the handle struct. Completion based
+                        APIs can still be built on top of poll/future abstractions but
+                        io-uring doesn't need it. io-uring still supports polling file descriptors in poll style 
+                        using `IORING_OP_POLL_ADD`
+                    </p>
+                    <p class="content">
+                        io-uring addition today allows you to do non blocking asyncronous File I/O.
+                        
+                        The ecosystem is still deciding what that API will look like. Today we have a number of new runtimes 
+                        who's APIs are worth looking at, this creates a very fragmented ecosystem.
+
+                    </p>
+                    <p class="content">
+
+                        The API should accomdate features like provided buffers and registered buffers. They are key in supporting
+                        zero copy send / recv methods on the sockets and O_DIRECT reads.
+
+                        The `tokio-rs/tokio-uring` repository had some experiments regarding how that API should look like. 
+                        
+                        Provided buffers creating pre allocated vectors for the kernel to choose from to fill. 
+                        It looked roughly like this
+
+                        https://github.com/tokio-rs/tokio-uring/blob/master/src/buf/fixed/plumbing/pool.rs 
+
+                        Most of the io-uring implementation has been moved to tokio.
+
+                    </p>
+                    <p class="content">
+
+                        There's also a registered buffers. You have to give the ownership to the kernel for the file descriptors
+                        at least and make sure your buffer is not dropped until the CQE arrives because the kernel can write to it anytime.
+
+                        This creates a different API, this is how tokio's io-uring internals look like and interestingly, Compio's API 
+
+                        <pre><code class="language-rust">
+use compio::{fs::File, io::AsyncReadAtExt};
+
+let file = File::open("Cargo.toml").await.unwrap();
+let (read, buffer) = file
+    .read_to_end_at(Vec::with_capacity(1024), 0)
+    .await
+    .unwrap();
+assert_eq!(read, buffer.len());
+let buffer = String::from_utf8(buffer).unwrap();
+println!("{}", buffer);
+                        </code></pre>
+
+So let's get distracted a bit look at strace for the same equivalent program in Compio and tokio, migrating our code to compio looks like this
+
+
+                        <pre><code class="language-rust">
+use compio::fs::File;
+use compio::io::{AsyncReadExt, AsyncWrite, AsyncWriteExt};
+
+#[compio::main]
+async fn main() -> std::io::Result<()> {
+    let path = "example.txt";
+
+    let mut file = File::create(path).await?;
+    file.write_all(b"Hello from Tokio!\n").await?;
+    file.flush().await?;
+    drop(file);
+
+    let mut file = File::open(path).await?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).await?;
+    print!("{contents}");
+
+    Ok(())
+}
+                        </code></pre>
+But it doesn't map so cleanly yet. There's an error
+<pre><code class="language-rust">
+
+error[E0599]: the method `write_all` exists for struct `compio::compio_fs::File`, but its trait bounds were not satisfied
+  --> src/main.rs:9:10
+   |
+ 9 |     file.write_all(b"Hello from Tokio!\n").await?;
+   |          ^^^^^^^^^
+   |
+  ::: /Users/Work/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/compio-fs-0.12.1/src/file.rs:51:1
+   |
+51 | pub struct File {
+   | --------------- doesn't satisfy `compio::compio_fs::File: AsyncWriteExt` or `compio::compio_fs::File: AsyncWrite`
+   |
+   = note: the following trait bounds were not satisfied:
+           `compio::compio_fs::File: AsyncWrite`
+           which is required by `compio::compio_fs::File: AsyncWriteExt`
+</code></pre>
+
+So this new AsyncWrite isn't letting me just write a buffer to the file descriptor, it needs ownership of the buffer and then 
+gives it back to me later point in time, this is to lock it and protect kernel reading or writing from it.
+<pre><code class="language-rust">
+use std::io::Cursor;
+
+use compio::buf::BufResult;
+use compio::fs::File;
+use compio::io::{AsyncReadExt, AsyncWrite, AsyncWriteExt};
+
+#[compio::main]
+async fn main() -> std::io::Result<()> {
+    let path = "example.txt";
+
+    let file = File::create(path).await?;
+    let mut file = Cursor::new(file);
+
+    let BufResult(result, _) =
+        file.write_all(b"Hello from Compio!\n").await;
+    result?;
+
+    file.flush().await?;
+    drop(file);
+
+    let file = File::open(path).await?;
+    let mut file = Cursor::new(file);
+
+    let BufResult(result, contents) =
+        file.read_to_string(String::new()).await;
+    result?;
+
+    print!("{contents}");
+
+    Ok(())
+}
+
+</code></pre>
+
+What's the strace looking like ?
+
+<pre><code class="language-rust">
+
+io_uring_setup(1024, .. ) = 4
+mmap(NULL, 65536, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_POPULATE, 4, 0x10000000) = 0xffffb1a60000
+mmap(NULL, 36928, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_POPULATE, 4, 0) = 0xffffb1c75000
+madvise(0xffffb1c75000, 36928, MADV_DONTFORK) = 0
+madvise(0xffffb1a60000, 65536, MADV_DONTFORK) = 0
+io_uring_setup(2, ....) = 0
+munmap(0xffffb1cb3000, 136)             = 0
+munmap(0xffffb1cb4000, 128)             = 0
+close(5)                                = 0
+io_uring_enter(4, 2, 1, IORING_ENTER_GETEVENTS|IORING_ENTER_NO_IOWAIT, NULL, 128) = 2
+io_uring_enter(4, 1, 1, IORING_ENTER_GETEVENTS|IORING_ENTER_NO_IOWAIT, NULL, 128) = 1
+close(5)                                = 0
+io_uring_enter(4, 1, 1, IORING_ENTER_GETEVENTS|IORING_ENTER_NO_IOWAIT, NULL, 128) = 1
+io_uring_enter(4, 1, 1, IORING_ENTER_GETEVENTS|IORING_ENTER_NO_IOWAIT, NULL, 128) = 1
+io_uring_enter(4, 1, 1, IORING_ENTER_GETEVENTS|IORING_ENTER_NO_IOWAIT, NULL, 128) = 1
+write(1, "Hello from Compio!\n", 19Hello from Compio!
+)    = 19
+close(5)                                = 0
+
+</code></pre>
+
+It has more io_uring_enter calls but less system calls overall.
+Tokio's file read implements tricks similar to rust's std file read method to probe read a file fully
+and allocate more space for it if needed.
+<p class="content"> 
+This is because we need to provide the number of bytes we want to read for 
+each io-uring submission and wait for that read request for let's say `N` bytes is completed, release 
+that memory and give it back to the caller.
+
+</p>
+                    </p>
+
+                    <p class="content"> 
+                        So how can we make tokio's mulithreaded work stealing runtime work with 
+                        io-uring cleanly? A big problem in tokio today lies in syncronising the bookeeping
+                        of submission queues and completion queue in the poll implementation of each io-uring operation 
+                        supported by tokio
+                    </p>
+
+                    <p class="content"> 
+                        Benchmarking your runtime implementation is not as simple as running a linux VM and running 
+                        criteron benchmarks. Should benchmark on real databases / servers workloads. This makes it hard to 
+                        do regression testing for runtime schedulers. Maybe we need something similar to crater at tokio
+                    </p>
+
+
+                    <p class="content"> 
+                        Because of batching I'd like to use an API that's heading towards compio but with a builder-plan 
+                        style type io.
+
+                        <pre><code class="language-rust">
+let mut io = Io::new();
+
+let file = io.file("foo.txt");
+
+let open = file.open(&mut io);
+let read = file.read_to_string(&mut io, 64 * 1024);
+let close = file.close(&mut io);
+
+io.soft_link([open, read])
+  .hard_link([read, close]);
+
+let result = io.submit().await?;</code></pre>
+
+                        This API should take care of handling edge cases and not dead locking itself but one of the tasks in the chain
+                        never got completed and they were hard link which might never cause a particular operation to wake up, this could 
+                        theoretically be solved with `AtomicWaker`
+                    </p>
+
+                    <p class="content">
+                        I'm visioning O_DIRECT reads to look like 
+<pre><code class="language-rust">
+let file = io.file("huge.dat")
+    .read_only()
+    .direct();
+
+let mut pool = FixedPool::new()
+    .entries(64)
+    .buffer_size(256 * 1024);
+
+let open = io.open(file);
+
+let read = io.read_fixed(
+    file,
+    pool.buffer(3),
+    4 * 1024 * 1024,
+    256 * 1024,
+);
+
+let close = io.close(file);
+
+io.soft_link([open, read])
+  .hard_link([read, close]);
+
+let (result, pool) = io.submit(pool).await?;
+
+let buf = pool.buffer(3);
+
+println!("{:?}", &buf[..result.bytes(read)?]);                        </code></pre>
+
+                    </p>
+                    <p class="content">
+
+                        So is everyone just doing file I/O with io-uring what about sockets? the existing
+                        stack is very satisfactory, there are some nice optimizations that come with sockets 
+                        but first we should finalize on an API to support completion based I/O with a work 
+                        stealing battle tested runtime on tokio_unstable
+
+
+                    <hr />
+                    <p>Links:</p>
+                    <ul>
+                        <li>
+                            <a class="underline" href="https://tokio.rs/tokio/">tokio — bridging with sync code</a>
+                        </li>
+                        <li>
+                            <a class="underline" href="https://docs.rs/compio-fs/latest/compio_fs/index.html">compio</a>
+                        </li>
+                        <li>
+                            <a class="underline" href="https://github.com/tokio-rs/io-uring">Low level io-uring abstraction</a>
+                        </li>
+                    </ul>
+                    <hr />
+                    <div class="footer-blog">
+                        <p class="date">
+                            <- <a href="/" class="underline"><span class="color-6">MyBlog</span></a>
+                        </p>
+                        <p class="duration no-margin-padding">
+                            <span class="color-2">1st October, 2026</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="./assets/scripts/bundle.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            swetrix.init('QgzKhY7hDGrm');
+            swetrix.trackViews();
+        });
+    </script>
+
+    <noscript>
+        <img src="https://api.swetrix.com/log/noscript?pid=QgzKhY7hDGrm" alt=""
+            referrerpolicy="no-referrer-when-downgrade" />
+    </noscript>
+</body>
+
+</html>
