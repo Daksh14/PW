@@ -149,9 +149,9 @@
 
                         1. Immediately yield back to our runtime and do start doing some other work or<br>
                         2. Wait until our I/O request is completed before yielding back to the runtime<br>
-
+<br>
                         SQ_POLL allows the kernel to spawn a dedicated thread to watch new submissions but 
-                        its not recommended to use by default, it carries the trade of a high CPU usage and 
+                        its not recommended to use by default, it carries the tradeoff of a high CPU usage and 
                         potentially slowing things down.
                     </p>
                     <p class="content">
@@ -257,7 +257,7 @@ write(4, "\1\0\0\0\0\0\0\0", 8)         = 8
                     </p>
                     <p class="content">
 
-                        There's also a registered buffers. You have to give the ownership to the kernel for the file descriptors
+                        There's also registered buffers which is different from provided buffers. You have to give the ownership to the kernel for the file descriptors
                         at least and make sure your buffer is not dropped until the CQE arrives because the kernel can write to it anytime.
 
                         This creates a different API, this is how tokio's io-uring internals look like and interestingly, Compio's API 
