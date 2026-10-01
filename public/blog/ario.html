@@ -133,29 +133,29 @@
                         linux is done through system calls.
                     </p>
                     <p class="content">
-                        `epoll` is a readiness based event notification we have been using, io-uring came in linux
+                        <code>epoll</code> is a readiness based event notification we have been using, io-uring came in linux
                         5.1, it works using shared memory mapped ring buffers between the userspace
-                        and kernel-space. To do I/O, "submit" an I/O request to the kernel, after some time, you 
-                        should expect a "completion queue entry" in your ring buffer.
+                        and kernel-space. To do I/O,<br> "submit" an I/O request to the kernel, after some time, you 
+                        should expect a completion queue entry in your ring buffer.
                     </p>
                     <p class="content">
                         `epoll` is stable and great for its use case. It will continued to be used for normal scenarios
                          io-uring allows advance workloads and fulfils custom needs. 
 </p>
 <p class="content">
-                        We dispatch completion check in the `turn` function inside tokio's scheduler for io-uring operations.
+                        We dispatch completion check in the <code>turn</code> function inside tokio's scheduler for io-uring operations.
 
-                        With io-uring we enter the kernel to do actual IO work using˚, `io_uring_enter(2)` we can<br>
-
-                        1. Immediately yield back to our runtime and do start doing some other work or<br>
-                        2. Wait until our I/O request is completed before yielding back to the runtime<br>
+                        to submit our submissions to the kernel we call <code>io_uring_enter(2)</code>
+                        this lets us wait until some CQEs are ready to be seen.
 <br>
-                        SQ_POLL allows the kernel to spawn a dedicated thread to watch new submissions but 
-                        its not recommended to use by default, it carries the tradeoff of a high CPU usage and 
-                        potentially slowing things down.
+<br>
+<br>
+                        For custom workloads where you have a thread in userspace that's whole job is to submit 
+                        submission queues can be enabled using Submission queue polling but it should be disabled by default
+                        and has trade offs with higher cpu and memory usage.
                     </p>
                     <p class="content">
-                        on a Limactl VM
+                        on a Limactl VM since I'm on macos
                         <pre><code class="language-plaintext">
 [lima@lima-default tokio-io-uring]$ uname -a
 Linux lima-default 6.19.10-300.fc44.aarch64 #1 SMP PREEMPT_DYNAMIC Wed Mar 25 17:45:07 UTC 2026 aarch64 GNU/Linux
