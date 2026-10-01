@@ -145,7 +145,7 @@
 <p class="content">
                         We dispatch completion check in the `turn` function inside tokio's scheduler for io-uring operations.
 
-                        With io-uring we enter the kernel to do actuak IO work using˚, `io_uring_enter(2)` we can<br>
+                        With io-uring we enter the kernel to do actual IO work using˚, `io_uring_enter(2)` we can<br>
 
                         1. Immediately yield back to our runtime and do start doing some other work or<br>
                         2. Wait until our I/O request is completed before yielding back to the runtime<br>
