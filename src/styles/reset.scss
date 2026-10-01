@@ -1,7 +1,8 @@
 html {
-  height: 100%;
   box-sizing: border-box;
   font-size: 100%;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 *,
@@ -13,36 +14,45 @@ html {
 body {
   margin: 0;
   padding: 0;
-  height: 100%;
+  min-height: 100%;
   overflow-x: hidden;
-  font-family: 'Fira Code', monospace !important;
-  color: #fff;
+  font-family: $font-body;
+  font-size: 1.0625rem;
+  font-weight: 450;
+  line-height: 1.6;
+  color: $text;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-h3,h1,
-h4,
-h5 {
+h1, h3, h4, h5 {
   margin: 0;
   padding: 0;
 }
 
-h1 {
-  font-size: 200%;
-}
-
-h3 {
-  display: inline-block;
+img, video {
+  max-width: 100%;
 }
 
 .no-margin-padding {
   margin: 0;
   padding: 0;
-  margin-top: 5px !important;
 }
 
 a {
   text-decoration: none;
   color: inherit;
+}
+
+::selection {
+  background: $accent;
+  color: $fg;
+}
+
+:focus-visible {
+  outline: 3px solid $accent;
+  outline-offset: 3px;
 }
 
 @mixin media-query($size) {

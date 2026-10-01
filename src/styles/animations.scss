@@ -1,26 +1,29 @@
-.equals {
-	position: relative;
-	left: -50px;
+@keyframes ripple {
+  to { transform: translate(-50%, -50%) scale(1); opacity: 0; }
 }
 
-.top {
-	position: relative;
-	top: -50px;
-	opacity: 0;
+.js .reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.7s $ease-emphasized, transform 0.7s $ease-emphasized;
+  transition-delay: var(--delay, 0s);
+
+  &.is-visible {
+    opacity: 1;
+    transform: none;
+  }
 }
 
-.right {
-	position: relative;
-	right: -50px;
-	opacity: 0;
-}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
 
-.left {
-	position: relative;
-	left: -50px;
-	opacity: 0;
-}
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 
-.dots {
-	opacity: 0;
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+  }
 }

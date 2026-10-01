@@ -1,82 +1,244 @@
-@import 'reset.scss';
 @import 'colors.scss';
+@import 'reset.scss';
+@import "~rfs/scss";
 
-.bg {
+$grid-bp: 940px;
+$main-text-bp: 600px;
+$gutter: clamp(1rem, 3vw, 3rem);
+
+// Shared building blocks
+%display {
+  font-family: $font-display;
+  font-weight: 900;
+  font-variation-settings: 'wdth' 120;
+  text-transform: uppercase;
+  line-height: 0.9;
+  letter-spacing: 0.01em;
+}
+
+%eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  font-family: $font-mono;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: $accent;
+
+  &::before {
+    content: '';
+    width: 2.5rem;
+    height: 4px;
+    background: currentColor;
+  }
+}
+
+// Reflector: a solid fill sweeps in from below and a glossy streak crosses the surface.
+// Set --fill / --on-fill on the element to pick the hover colours.
+%reflector {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: color 0.35s $ease, box-shadow 0.35s $ease, transform 0.35s $ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--fill, #{$accent});
+    transform: scaleY(0);
+    transform-origin: 50% 100%;
+    transition: transform 0.45s $ease-emphasized;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -60%;
+    width: 40%;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(100deg, transparent, rgba(236, 239, 244, 0.45), transparent);
+    transform: skewX(-20deg) translateX(0);
+    opacity: 0;
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: var(--on-fill, #{$bg});
+
+    &::before { transform: scaleY(1); }
+
+    &::after {
+      opacity: 1;
+      transform: skewX(-20deg) translateX(450%);
+      transition: transform 0.8s $ease, opacity 0.2s linear;
+    }
+  }
+}
+
+%button {
+  @extend %reflector;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border: 2px solid $fg;
+  border-radius: 0;
+  font-family: $font-display;
+  font-weight: 900;
+  font-variation-settings: 'wdth' 120;
+  font-size: clamp(1.25rem, 2.6vw, 2.25rem);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: $fg;
+  --fill: #{$accent};
+  --on-fill: #{$bg};
+
+  &:hover {
+    border-color: $accent;
+  }
+
+}
+
+// Page canvas
+html, .bg {
   background: $background-color;
+}
+
+body {
+  position: relative;
+}
+
+.container-lg.bg {
+  background: transparent;
 }
 
 .container-lg {
   margin: 0 auto;
-  padding-right: 1rem;
-  padding-left: 1rem;
+  padding-right: $gutter;
+  padding-left: $gutter;
   width: 100%;
-
-  @include media-query-min-width(1200px) {
-    max-width: 1500px;
-  }
-
-  @include media-query-min-width(1800px) {
-    max-width: 1600px;
-  }
+  max-width: 1400px;
 }
 
-.profile {
-  height: 100%;
-  display: flex;
-  justify-content: stretch;
-  gap: 20px;
-
-  img { 
-    width: 100%;
-    max-width: 600px;
-  }
-
-  div {
-    background: $color-1;
-    padding: 20px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    
-  }
+// Band whose background runs edge to edge while its content stays in the column
+%band {
+  box-shadow: 0 0 0 100vmax var(--band-bg);
+  clip-path: inset(0 -100vmax);
 }
 
-$grid-bp: 940px;
-$main-text-bp: 600px;
-
-@import 'header.scss';
-@import 'footer.scss';
-@import "~rfs/scss";
-
-.commit-details {
-  @include font-size(1rem);
-}
-
-p {
-  font-weight: lighter;
+// Headlines sized by main.js to span the full width; vw value is the no-JS fallback
+.fit {
+  display: block;
+  width: max-content;
+  max-width: none;
+  white-space: nowrap;
+  font-size: min(17vw, 15rem);
 }
 
 .main-text {
-  white-space: nowrap;
-  margin-top: 70px;
-  margin-bottom: 0px;
+  @extend %display;
+  margin: 0;
+  color: $fg;
 
-  @include font-size(6.5rem);
-
-  @include media-query($grid-bp) {
-    @include font-size(5rem);
-  }
-
-  @include media-query($main-text-bp) {
-    @include font-size(3rem);
-    margin-top: 75px;
-  }
-
-  font-weight: 900;
+  .alt { color: $accent; }
 }
 
-main {
+// Github profile card
+.profile {
+  position: relative;
+  border: 2px solid $fg;
+  background: $surface;
+  box-shadow: $elev-3;
+  transition: border-color 0.3s $ease, box-shadow 0.3s $ease, transform 0.3s $ease;
 
+  img {
+    display: block;
+    width: 100%;
+    filter: grayscale(1) contrast(1.15);
+    transition: filter 0.4s $ease;
+  }
+
+  &:hover {
+    border-color: $accent;
+    box-shadow: $elev-3;
+
+    img { filter: none; }
+  }
+
+  @include media-query($grid-bp) {
+    margin-top: 2.5rem;
+  }
+}
+
+// Sections
+.section {
+  padding-top: clamp(4rem, 10vh, 7rem);
+  scroll-margin-top: 72px;
+}
+
+.section-eyebrow {
+  @extend %eyebrow;
+  margin-bottom: 1.25rem;
+}
+
+hr {
+  height: 2px;
+  margin: 0;
+  border: 0;
+  background: $fg;
+}
+
+p {
+  font-weight: 450;
+}
+
+.underline {
+  cursor: pointer;
+  background-image: linear-gradient($accent, $accent);
+  background-repeat: no-repeat;
+  background-size: 100% 3px;
+  background-position: 0 100%;
+  transition: background-size 0.3s $ease, color 0.2s ease;
+
+  &:hover {
+    background-size: 100% 100%;
+    color: $bg;
+  }
+}
+
+button {
+  @extend %button;
+  cursor: pointer;
+  background: transparent;
+}
+
+// Material ripple, injected by main.js
+.ripple {
+  position: absolute;
+  z-index: 2;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.28;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0);
+  animation: ripple 0.6s $ease forwards;
+}
+
+@import 'header.scss';
+@import 'footer.scss';
+
+main {
   @import 'first-page.scss';
   @import 'second-page.scss';
   @import 'blog-post.scss';
@@ -87,53 +249,17 @@ main {
   }
 }
 
-button {
-  background: transparent;
-  border: 1px solid $color-6;
-  border-radius: 20px;
-  font-family: "Fira Code";
-  padding: 10px;
-  cursor: pointer;
-  font-weight: bold;
-  color: white;
-  background: $color-6;
-  outline: none;
-}
-
-.commit {
-  display: inline;
-  font-weight: 900;
-  background: linear-gradient(to right, #FFF 20%, $color-4 40%, $color-4 60%, #FFF 80%);
-  background-size: 400%;
-
-  color: transparent;
-  -webkit-background-clip: text;
-
-  animation: shine 5s linear infinite;
-  -webkit-animation: shine 5s linear infinite;
-
-  @keyframes shine {
-    to {
-      background-position: 400%;
-    }
-  }
-}
-
-.spacer {
-  margin-right: 5px;
-}
-
-.underline {
-  cursor: pointer;
-  background-image: linear-gradient(white, white);
-  background-repeat: no-repeat;
-  background-size: 100% 1px;     // full width (like scaleX(1))
-  background-position: 0 100%;
-  transition: background-size 0.25s ease-out;
-  display: inline;               //  
-  &:hover {
-        background-size: 0 1px;
-  }
+// Progress bar across the top of a post (added by main.js)
+.read-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  height: 3px;
+  width: 100%;
+  transform-origin: 0 50%;
+  transform: scaleX(var(--progress, 0));
+  background: $accent;
 }
 
 @import 'animations.scss';

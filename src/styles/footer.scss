@@ -1,8 +1,25 @@
 $bp-1: 700px;
 
 footer {
-	background: $color-1;
-	padding: 20px;
+	position: relative;
+	margin-top: 6rem;
+	padding: 2.5rem 0 3rem;
+	background: $surface;
+	border-top: 2px solid $accent;
+	font-family: $font-mono;
+	font-size: 0.85rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: $text-muted;
+
+	p {
+		margin: 0;
+	}
+
+	a.underline {
+		color: $fg;
+	}
 
 	@include media-query($bp-1) {
 		text-align: center;

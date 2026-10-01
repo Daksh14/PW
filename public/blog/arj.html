@@ -34,10 +34,10 @@
     <meta name="robots" content="index, follow, noarchive" />
 
     <title>Programming TurtleBot3 with ROS2 Jazzy and Rust | MyBlog</title>
-    <!-- Fira Code -->
+    <!-- Fonts: Roboto Flex, Roboto Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&family=Roboto+Mono:wght@400;500;700&display=swap"
         rel="stylesheet" />
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
@@ -45,10 +45,7 @@
     <link rel="stylesheet" href="../assets/styles/main.css" />
 
     <!-- Syntax Highlighting -->
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/solarized-dark.min.css"
-        integrity="sha512-kBHeOXtsKtA97/1O3ebZzWRIwiWEOmdrylPrOo3D2+pGhq1m+1CroSOVErIlsqn1xmYowKfQNVDhsczIzeLpmg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/nord.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"
         integrity="sha512-gU7kztaQEl7SHJyraPfZLQCNnrKdaQi5ndOyt4L4UPL/FHDd/uB9Je6KDARIqwnNNE27hnqoWLBq+Kpe4iHfeQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -111,9 +108,11 @@
 <body class="bg">
     <header>
         <div class="parent container-lg">
-            <div class="left-part">
-                <p class="no-margin-padding">dakshu.xyz</p>
-            </div>
+            <nav class="center-part" aria-label="Sections">
+                <a href="/#blog">blog</a>
+                <a href="/#projects">projects</a>
+                <a href="/#links">links</a>
+            </nav>
         </div>
     </header>
     <div class="container-lg bg">
@@ -475,7 +474,7 @@ pub enum Sequence {
             </div>
         </main>
     </div>
-    <script src="./assets/scripts/bundle.js"></script>
+    <script src="../assets/scripts/bundle.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Initialising the script with the Project ID

@@ -12,10 +12,12 @@
   <meta property="og:type" content="website" />
 
   <title>Daksh Upadhyay</title>
-  <!-- Fira Code -->
+  <meta name="theme-color" content="#2E3440">
+  <script>document.documentElement.classList.add('js')</script>
+  <!-- Fonts: Roboto Flex, Roboto Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <!-- Animate.css -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
   <!-- CSS File -->
@@ -39,126 +41,116 @@
 <body class="bg">
   <header>
     <div class="parent container-lg">
-      <div class="left-part"><p class="no-margin-padding">dakshu.xyz</p></div>
-        <div class="right-part">
-          <p class="no-margin-padding" id="span"></p>
-        </div>
+      <nav class="center-part" aria-label="Sections">
+        <a href="#blog">blog</a>
+        <a href="#projects">projects</a>
+        <a href="#links">links</a>
+      </nav>
+      <div class="right-part">
+        <p class="no-margin-padding" id="span"></p>
+      </div>
     </div>
   </header>
   <div class="container-lg bg">
     <main>
-      <div class="first-page">
-        <div>
-          <h1 class="main-text">
-            <span class="color-4">Daksh Upadhyay</span>
+      <section class="first-page">
+        <div class="hero">
+          <h1 class="main-text reveal" aria-label="Daksh Upadhyay">
+            Daksh <span class="alt">Upadhyay</span>
           </h1>
-        </div>
-      </div>
-      <div class="intro-para content">
-          <p class="">Hi and welcome to my space on the internet, here I talk about software, blogs and experiment. </p>
-          <p>
-            I am comfortable with rust with a focus on systems programming.
-            </p><p>I am fascinated with programming robots, system kernels, bare metal and servers.
-          </p>
-          <div class="profile">
-            <img src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=daksh14&theme=dracula">
-          </div>
-          <h2>Links</h2>
-          <h3 class="spacer">
-            <a href="https://github.com/Daksh14" class="color-4 underline">Github</a>
-          </h3>
-          <h3 class="spacer">
-            <a href="https://mailhide.io/e/pcelTq87" class="color-4 underline">Email</a>
-          </h3>
-          <h3>
-            <a href="https://www.linkedin.com/in/daksh-upadhyay-94a817243/" class="color-4 underline">LinkedIn</a>
-          </h3>
-      </div>
-      <hr>
-      <div class="bg">
-      <main>
-        <div class="first-page first-page-blog">
-          <div>
-            <h4 class="no-margin-padding main-text">
-              <span class="color-2">T:</span>
-              <span class="color-6">MyBlog</span>             
-            </h4>
-              <ul>
-                <li><a class="underline" href="./blog/ario.html"
-                >Taking about Asynchronous runtimes with io-uring</a></li>
-                <li><a class="underline" href="./blog/arj.html"
-                >A ros2 journey</a></li>
-                <li><a class="underline" href="./blog/dpmucl.html"
-                >Debugging proc macros using croc-look</a
-              ></li>
-              </ul>
-              
+          <div class="hero-copy reveal" style="--delay: .1s">
+            <p>Here I talk about software, blogs and experiment.</p>
+            <p>I really admire <em>rust</em> it lets me write safe abastractions over computers</p>
+            <p>I am fascinated with programming <em>robots, system kernels, bare metal and servers</em>.</p>
           </div>
         </div>
-      </main>
-    </div>
-    <hr>
-      <div class="second-page">
-        <h2>Open Source Projects</h2>
-        <grid class="projects">
-          <div class="turtlebot">
+        <div class="intro-para content">
+          <div class="links reveal" id="links" style="--delay: .2s">
+            <h2>Links</h2>
+            <div class="link-row">
+              <h3><a href="https://github.com/Daksh14"><span>Github</span><span class="arrow" aria-hidden="true">↗</span></a></h3>
+              <h3><a href="https://mailhide.io/e/pcelTq87"><span>Email</span><span class="arrow" aria-hidden="true">↗</span></a></h3>
+              <h3><a href="https://www.linkedin.com/in/daksh-upadhyay-94a817243/"><span>LinkedIn</span><span class="arrow" aria-hidden="true">↗</span></a></h3>
+            </div>
+          </div>
+          <div class="profile reveal" style="--delay: .3s">
+            <img src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=daksh14&theme=nord_dark" alt="GitHub contribution summary for Daksh14" loading="lazy">
+          </div>
+        </div>
+      </section>
+
+      <section class="section first-page first-page-blog" id="blog">
+        <p class="section-eyebrow reveal">Writing</p>
+        <h4 class="main-text reveal"><span class="fit">MyBlog</span></h4>
+        <ul>
+          <li class="reveal"><a href="./blog/ario.html"><span class="num" aria-hidden="true">01</span><span>Taking about Asynchronous runtimes with io-uring</span><span class="arrow" aria-hidden="true">→</span></a></li>
+          <li class="reveal" style="--delay: .08s"><a href="./blog/arj.html"><span class="num" aria-hidden="true">02</span><span>A ros2 journey</span><span class="arrow" aria-hidden="true">→</span></a></li>
+          <li class="reveal" style="--delay: .16s"><a href="./blog/dpmucl.html"><span class="num" aria-hidden="true">03</span><span>Debugging proc macros using croc-look</span><span class="arrow" aria-hidden="true">→</span></a></li>
+        </ul>
+      </section>
+
+      <section class="section second-page" id="projects">
+        <p class="section-eyebrow reveal">Open source</p>
+        <h2 class="reveal"><span class="fit">Projects</span></h2>
+        <div class="projects">
+          <div class="turtlebot reveal">
             <div class="card">
               <div>
-                <h1 class="underline"><a href="https://github.com/Daksh14/turtlebot3-rust">Turtlebot3-rust</a></h1>
+                <h1><a href="https://github.com/Daksh14/turtlebot3-rust">Turtlebot3-rust</a></h1>
                 <h3>yolov8 object detection and ros2 lidar obstacle avoidance with navigation in rust for the turtlebot3</h3>
               </div>
             </div>
           </div>
-          <div class="octane">
+          <div class="octane reveal" style="--delay: .08s">
             <div class="card">
               <div>
-                <h1 class="underline"><a href="https://github.com/OctaneWeb/Octane">Octane</a></h1>
+                <h1><a href="https://github.com/OctaneWeb/Octane">Octane</a></h1>
                 <h3>An experimental, multithreaded web server with its own HTTP implementation</h3>
               </div>
             </div>
           </div>
-          <div class="card rtoml">
-            <div>
-              <h1 class="underline"><a href='https://github.com/Daksh14/Rtoml'>Rtoml</a></h1>
-              <h3>An experimental TOML lexer and parser written in rust</h3>
-            </div>
-          </div>
-          <div class="croc-look">
+          <div class="rtoml reveal">
             <div class="card">
               <div>
-                <h1 class="underline"><a href="https://github.com/Daksh14/croc-look">croc-look</a></h1>
+                <h1><a href="https://github.com/Daksh14/Rtoml">Rtoml</a></h1>
+                <h3>An experimental TOML lexer and parser written in rust</h3>
+              </div>
+            </div>
+          </div>
+          <div class="croc-look reveal" style="--delay: .08s">
+            <div class="card">
+              <div>
+                <h1><a href="https://github.com/Daksh14/croc-look">croc-look</a></h1>
                 <h3>A tool to make testing and debuging proc macros easier</h3>
               </div>
             </div>
           </div>
-          <div class="iso-rs">
+          <div class="iso-rs reveal" style="--delay: .16s">
             <div class="card">
               <div>
-                <h1 class="underline"><a href="https://github.com/dashxhq/iso-rs">iso-rs</a></h1>
-                <br>
+                <h1><a href="https://github.com/dashxhq/iso-rs">iso-rs</a></h1>
                 <h3>A tool to query ISO country data</h3>
               </div>
             </div>
           </div>
-          <div class="sanitizer">
+          <div class="sanitizer reveal">
             <div class="card">
               <div>
-                <h1 class="underline"><a href="https://github.com/dashxhq/sanitizer">Sanitizer</a></h1>
+                <h1><a href="https://github.com/dashxhq/sanitizer">Sanitizer</a></h1>
                 <h3>A procedural macro to sanitize struct fields</h3>
               </div>
             </div>
           </div>
-          <div class="co-chat">
+          <div class="co-chat reveal" style="--delay: .08s">
             <div class="card">
               <div>
-                <h1 class="underline"><a href="https://github.com/Daksh14/Co-Chat">Co-Chat</a></h1>
+                <h1><a href="https://github.com/Daksh14/Co-Chat">Co-Chat</a></h1>
                 <h3>A real time C# chat application made using SignalR</h3>
               </div>
             </div>
           </div>
-        </grid>
-      </div>
-      <br>
+        </div>
+      </section>
       <div class="third-page" style="display: none">
         <div class="title-text"><p class="inline-text"><span class="color-7">ITS THIS A DREAM</span><span class="color-5">?</span></p></div>
         <iframe style="border: 0; width: 100%; height: 42px;" src="https://bandcamp.com/EmbeddedPlayer/album=3328792103/size=small/bgcol=ffffff/linkcol=0687f5/track=1822786663/transparent=true/" seamless><a href="https://fantasy-deluxe.bandcamp.com/album/midnight-radio-deluxe">MIDNIGHT RADIO DELUXE by ΣPSON</a></iframe>
@@ -167,7 +159,7 @@
   </div>
   <footer>
     <div class="container-lg">
-      <p>Made with <a class="color-4 underline" href="https://www.nordtheme.com/">Nordtheme</a> and <a class="underline" href="https://github.com/tonsky/FiraCode">Fira Code</a></p>
+      <p>Made with <a class="underline" href="https://www.nordtheme.com/">Nordtheme</a> and <a class="underline" href="https://fonts.google.com/specimen/Roboto+Flex">Roboto Flex</a></p>
     </div>
   </footer>
   <script src="./assets/scripts/bundle.js"></script>
