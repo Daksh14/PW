@@ -422,9 +422,9 @@ io.soft_link([open, read])
 
 let result = io.submit().await?;</code></pre>
 
-                        This API should take care of handling edge cases and not dead locking itself but one of the tasks in the chain
-                        never got completed and they were hard link which might never cause a particular operation to wake up, this could 
-                        theoretically be solved with `AtomicWaker`
+                        This API should take care of handling edge cases to prevent dead locking or error if one of the tasks in the chain
+                        never got completed and they were hard linked or your runtime waker gets invalidated
+                        during the execution of the operation which might never let your future complete even though it is.  
                     </p>
 
                     <p class="content">
@@ -461,10 +461,9 @@ println!("{:?}", &buf[..result.bytes(read)?]);                        </code></p
                     </p>
                     <p class="content">
 
-                        So is everyone just doing file I/O with io-uring what about sockets? the existing
-                        stack is very satisfactory, there are some nice optimizations that come with sockets 
+                        So is everyone just doing file I/O with io-uring what about sockets? there are some nice optimizations that come with sockets 
                         but first we should finalize on an API to support completion based I/O with a work 
-                        stealing battle tested runtime on tokio_unstable
+                        stealing battle tested runtime on tokio_unstable. More on sockets soon
 
 
                     <hr />
