@@ -393,9 +393,8 @@ io.soft_link([open, read])
 
 let result = io.submit().await?;</code></pre>
 
-                        This API should take care of handling edge cases to prevent dead locking or error if one of the tasks in the chain
-                        never got completed and they were hard linked or your runtime waker gets invalidated
-                        during the execution of the operation which might never let your future complete even though it is.  
+                        This API should take care of handling edge cases to prevent dead locking and handling behavior for soft link errors.
+                        The bookkeeping ensures runtime waker does not get invalidated during the execution of the operation which can cause your future to never be polled again.
                     </p>
                     <p>IO Uring Buf ring allows you to manage ring buffers to gain advantage with sockets <a href=" https://docs.rs/io_uring_buf_ring/latest/io_uring_buf_ring/">See here</a></p>
 
