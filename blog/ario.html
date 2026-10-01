@@ -227,8 +227,8 @@ write(4, "\1\0\0\0\0\0\0\0", 8)         = 8
                     <p class="content">
                         Tokio works on a layer of abstraction higher than `mio`. MIO is lightweight
                         a deterministic set of code that interfaces with different operating systems
-                        and even notification mechanim supported by the OS. The tokio runtime `Handle` then keeps
-                        an instance of Poll from MIO in the handle struct. Completion based
+                        and event notification mechanim supported by the OS. The tokio runtime `Handle` then keeps
+                        an instance of Poll from MIO in the handle struct. <br>Completion based
                         APIs can still be built on top of poll/future abstractions but
                         io-uring doesn't need it. io-uring still supports polling file descriptors in poll style 
                         using `IORING_OP_POLL_ADD`
@@ -236,8 +236,8 @@ write(4, "\1\0\0\0\0\0\0\0", 8)         = 8
                     <p class="content">
                         io-uring addition today allows you to do non blocking asyncronous File I/O.
                         
-                        The ecosystem is still deciding what that API will look like. Today we have a number of new runtimes 
-                        who's APIs are worth looking at, this creates a very fragmented ecosystem.
+                        The tokio ecosystem is still deciding what that API will look like. Today we have a number of new runtimes 
+                        who's APIs are worth looking at, this creates a very fragmented ecosystem though.
 
                     </p>
                     <p class="content">
@@ -258,7 +258,7 @@ write(4, "\1\0\0\0\0\0\0\0", 8)         = 8
                     <p class="content">
 
                         There's also registered buffers which is different from provided buffers. You give the ownership of your file descriptor
-                        and your buffer until you reap the completion queue from the ring.
+                        and your buffer until you reap the completion queue from the ring
 
                         This creates a different API, this is how tokio's io-uring internals look like and interestingly, Compio's API 
 
