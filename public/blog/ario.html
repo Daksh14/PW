@@ -397,6 +397,7 @@ let result = io.submit().await?;</code></pre>
                         never got completed and they were hard linked or your runtime waker gets invalidated
                         during the execution of the operation which might never let your future complete even though it is.  
                     </p>
+                    <p>IO Uring Buf ring allows you to manage ring buffers to gain advantage with sockets <a href=" https://docs.rs/io_uring_buf_ring/latest/io_uring_buf_ring/">See here</a></p>
 
                     <p class="content">
                         I'm visioning O_DIRECT reads to look like 
@@ -447,6 +448,9 @@ println!("{:?}", &buf[..result.bytes(read)?]);</code></pre>
                         </li>
                         <li>
                             <a class="underline" href="https://github.com/tokio-rs/io-uring">Low level io-uring abstraction</a>
+                        </li>
+                        <li>
+                            <a class="underline" href="https://docs.rs/io_uring_buf_ring/latest/io_uring_buf_ring/">io uring buf ring utility</a>
                         </li>
                     </ul>
                     <hr />
