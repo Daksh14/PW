@@ -5,8 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <meta name="description" content="Understand blocking vs async Rust. Learn when to use tokio::spawn, spawn_blocking, and std::thread::spawn — and how to avoid stalling the tokio runtime with CPU-bound or synchronous I/O." />
-    <meta name="keywords" content="rust, async rust, blocking, tokio, spawn_blocking, std::thread::spawn, tokio::spawn, futures, tokio-console, sync mutex, async mutex, concurrency, runtime, worker threads" />
+    <meta name="description" content="Completion vs readiness based " />
+    <meta name="keywords" content="rust, io-uring, compio, glomio, tokio, compio, concurrency, runtime," />
     <meta name="author" content="Dakshu" />
     <link rel="canonical" href="https://dakshu.xyz/blog/ario.html" />
     <!-- Open graph -->
@@ -20,7 +20,7 @@
     <meta property="article:author" content="Dakshu" />
     <meta property="article:tag" content="rust" />
     <meta property="article:tag" content="async" />
-    <meta property="article:tag" content="tokio" />
+    <meta property="article:tag" content="io-uring" />
     <meta property="article:tag" content="concurrency" />
     <!-- Twitter -->
     <meta name="twitter:card" content="summary" />
@@ -75,7 +75,7 @@
     {
       "@context": "https://schema.org",
       "@type": "BlogPosting",
-      "headline": "Blocking vs Async Rust: spawn_blocking, tokio::spawn, and OS Threads",
+      "headline": "Completion vs readiness based IO",
       "description": "Completion based IO vs Readiness based IO.",
       "url": "https://dakshu.xyz/blog/ario.html",
       "datePublished": "2026-03-30",
@@ -94,7 +94,7 @@
         "@type": "WebPage",
         "@id": "https://dakshu.xyz/blog/ario.html"
       },
-      "keywords": ["rust", "async rust", "blocking", "tokio", "spawn_blocking", "std::thread::spawn", "futures", "concurrency", "tokio-console", "worker threads"],
+      "keywords": ["rust", "async rust", "io-uring", "tokio", "glomio", "compio"],
       "articleSection": "Technology",
       "inLanguage": "en-US",
       "about": [
@@ -125,7 +125,7 @@
                     <p class="date"><span class="color-2">30th September, 2026</span></p>
                     <p class="duration"><span class="color-4">8 min read</span></p>
                     <p class="heading">
-                        <span class="color-7">Blocking and async rust and io-uring</span>
+                        <span class="color-7">Completion based IO vs Readiness based IO</span>
                     </p>
                     <hr />
                     <p class="content">
