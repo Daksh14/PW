@@ -33,10 +33,10 @@
     <meta name="robots" content="index, follow, noarchive" />
 
     <title>Taking about Asynchronous runtimes with io-uring | MyBlog</title>
-    <!-- Fira Code -->
+    <!-- Fonts: Roboto Flex, Roboto Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&family=Roboto+Mono:wght@400;500;700&display=swap"
         rel="stylesheet" />
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
@@ -44,10 +44,7 @@
     <link rel="stylesheet" href="../assets/styles/main.css" />
 
     <!-- Syntax Highlighting -->
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/solarized-dark.min.css"
-        integrity="sha512-kBHeOXtsKtA97/1O3ebZzWRIwiWEOmdrylPrOo3D2+pGhq1m+1CroSOVErIlsqn1xmYowKfQNVDhsczIzeLpmg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/nord.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"
         integrity="sha512-gU7kztaQEl7SHJyraPfZLQCNnrKdaQi5ndOyt4L4UPL/FHDd/uB9Je6KDARIqwnNNE27hnqoWLBq+Kpe4iHfeQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -110,9 +107,11 @@
 <body class="bg">
     <header>
         <div class="parent container-lg">
-            <div class="left-part">
-                <p class="no-margin-padding">dakshu.xyz</p>
-            </div>
+            <nav class="center-part" aria-label="Sections">
+                <a href="/#blog">blog</a>
+                <a href="/#projects">projects</a>
+                <a href="/#links">links</a>
+            </nav>
         </div>
     </header>
     <div class="container-lg bg">
@@ -139,7 +138,7 @@
                         should expect a completion queue entry in your ring buffer.
                     </p>
                     <p class="content">
-                        `epoll` is stable and great for its use case. It will continued to be used for normal scenarios
+                        <code>epoll</code> is stable and great for its use case. It will continued to be used for normal scenarios
                          io-uring allows advance workloads and fulfils custom needs. 
 </p>
 <p class="content">
@@ -156,16 +155,11 @@
                     </p>
                     <p class="content">
                         on a Limactl VM since I'm on macos
-                        <pre><code class="language-plaintext">
-[lima@lima-default tokio-io-uring]$ uname -a
-Linux lima-default 6.19.10-300.fc44.aarch64 #1 SMP PREEMPT_DYNAMIC Wed Mar 25 17:45:07 UTC 2026 aarch64 GNU/Linux
-</code>
-</pre>
+                        <pre><code class="language-plaintext">[lima@lima-default tokio-io-uring]$ uname -a
+Linux lima-default 6.19.10-300.fc44.aarch64 #1 SMP PREEMPT_DYNAMIC Wed Mar 25 17:45:07 UTC 2026 aarch64 GNU/Linux</code></pre>
                         Running strace on a rust tokio file reading project
 
-                        <pre><code class="language-rust">
-
-#[tokio::main]
+                        <pre><code class="language-rust">#[tokio::main]
 async fn main() -> std::io::Result<()> {
     let path = "example.txt";
 
@@ -180,15 +174,10 @@ async fn main() -> std::io::Result<()> {
     print!("{contents}");
 
     Ok(())
-}
-
-
-</code>
-</pre>
+}</code></pre>
 
 Compile with <code>RUSTFLAGS="--cfg tokio_unstable" cargo b --release</code> and strace shows 
-<pre><code class="language-rust">
-[lima@lima-default tokio-io-uring]$ strace ./target/release/tokio-io-uring
+<pre><code class="language-plaintext">[lima@lima-default tokio-io-uring]$ strace ./target/release/tokio-io-uring
 // initalize io-uring in tokio 
 io_uring_setup(256, {flags=0, ... })
 mmap(NULL, 16384, PROT_R, ... )
@@ -203,8 +192,7 @@ futex(0xaaab0a14d3a0, ...) = 0
 mmap(NULL, 2162688, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0xffffbcb83000
 madvise(0xffffbcb83000, 65536, MADV_GUARD_INSTALL) = 0
 rt_sigprocmask(SIG_BLOCK, ~[], [], 8)   = 0
-clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0xffffbcd924e8, parent_tid=0xffffbcd92190, exit
-_signal=0, stack=0xffffbcb83000, stack_size=0x20e9a0, tls=0xffffbcd927e0} => {parent_tid=[18539]}, 88) = 18539
+clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0xffffbcd924e8, parent_tid=0xffffbcd92190, exit_signal=0, stack=0xffffbcb83000, stack_size=0x20e9a0, tls=0xffffbcd927e0} => {parent_tid=[18539]}, 88) = 18539
 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
 futex(0xaaab0a144f90, FUTEX_WAKE_PRIVATE, 1) = 1
 futex(0xaaab0a14d3a0, FUTEX_WAIT_BITSET_PRIVATE, 1, NULL, FUTEX_BITSET_MATCH_ANY) = 0
@@ -216,22 +204,20 @@ futex(0xaaab0a14d3a0, FUTEX_WAIT_BITSET_PRIVATE, 2, NULL, FUTEX_BITSET_MATCH_ANY
 write(4, "\1\0\0\0\0\0\0\0", 8)         = 8
 write(1, "Hello from Tokio!\n", 18Hello from Tokio!)     = 18
 close(7)                                = 0
-write(4, "\1\0\0\0\0\0\0\0", 8)         = 8
-</code>
-</pre>
+write(4, "\1\0\0\0\0\0\0\0", 8)         = 8</code></pre>
 
                     In tokio we have managed to mix epoll which is a readiness based API and io-uring 
                     which is a completion based API. Why so?
                     </p>
 
                     <p class="content">
-                        Tokio works on a layer of abstraction higher than `mio`. MIO is lightweight
+                        Tokio works on a layer of abstraction higher than <code>mio</code>. MIO is lightweight
                         a deterministic set of code that interfaces with different operating systems
-                        and event notification mechanim supported by the OS. The tokio runtime `Handle` then keeps
+                        and event notification mechanim supported by the OS. The tokio runtime <code>Handle</code> then keeps
                         an instance of Poll from MIO in the handle struct. <br>Completion based
                         APIs can still be built on top of poll/future abstractions but
                         io-uring doesn't need it. io-uring still supports polling file descriptors in poll style 
-                        using `IORING_OP_POLL_ADD`
+                        using <code>IORING_OP_POLL_ADD</code>
                     </p>
                     <p class="content">
                         io-uring addition today allows you to do non blocking async File I/O.
@@ -244,7 +230,7 @@ write(4, "\1\0\0\0\0\0\0\0", 8)         = 8
                         The API should accomdate features like provided buffers and registered buffers. They are key in supporting
                         zero copy send / recv methods on the sockets and O_DIRECT reads.
 
-                        The `tokio-rs/tokio-uring` repository had some experiments regarding how that API should look like. 
+                        The <code>tokio-rs/tokio-uring</code> repository had some experiments regarding how that API should look like. 
                         
                         Provided buffers creating pre allocated vectors for the kernel to choose from to fill. 
                         It looked roughly like this
@@ -261,8 +247,7 @@ write(4, "\1\0\0\0\0\0\0\0", 8)         = 8
 
                         This creates a different API, this is how tokio's io-uring internals look like and interestingly, Compio's API 
 
-                        <pre><code class="language-rust">
-use compio::{fs::File, io::AsyncReadAtExt};
+                        <pre><code class="language-rust">use compio::{fs::File, io::AsyncReadAtExt};
 
 let file = File::open("Cargo.toml").await.unwrap();
 let (read, buffer) = file
@@ -271,14 +256,12 @@ let (read, buffer) = file
     .unwrap();
 assert_eq!(read, buffer.len());
 let buffer = String::from_utf8(buffer).unwrap();
-println!("{}", buffer);
-                        </code></pre>
+println!("{}", buffer);</code></pre>
 
 So let's get distracted a bit look at strace for the same equivalent program in Compio and tokio, migrating our code to compio looks like this
 
 
-                        <pre><code class="language-rust">
-use compio::fs::File;
+                        <pre><code class="language-rust">use compio::fs::File;
 use compio::io::{AsyncReadExt, AsyncWrite, AsyncWriteExt};
 
 #[compio::main]
@@ -296,12 +279,9 @@ async fn main() -> std::io::Result<()> {
     print!("{contents}");
 
     Ok(())
-}
-                        </code></pre>
+}</code></pre>
 But it doesn't map so cleanly yet. There's an error
-<pre><code class="language-rust">
-
-error[E0599]: the method `write_all` exists for struct `compio::compio_fs::File`, but its trait bounds were not satisfied
+<pre><code class="language-plaintext">error[E0599]: the method `write_all` exists for struct `compio::compio_fs::File`, but its trait bounds were not satisfied
   --> src/main.rs:9:10
    |
  9 |     file.write_all(b"Hello from Tokio!\n").await?;
@@ -314,13 +294,11 @@ error[E0599]: the method `write_all` exists for struct `compio::compio_fs::File`
    |
    = note: the following trait bounds were not satisfied:
            `compio::compio_fs::File: AsyncWrite`
-           which is required by `compio::compio_fs::File: AsyncWriteExt`
-</code></pre>
+           which is required by `compio::compio_fs::File: AsyncWriteExt`</code></pre>
 
 Compio's file only implement methods for fixed read and writes, I will need a std cursor abstraction to read it with io-uring. Tokio does a probe read similar to std::fs does.
 We need to give the ownership of the buffer and file desciptor to the runtime and the runtime will return us back the owned values once corresponding completion queue entry is reaped
-<pre><code class="language-rust">
-use std::io::Cursor;
+<pre><code class="language-rust">use std::io::Cursor;
 
 use compio::buf::BufResult;
 use compio::fs::File;
@@ -350,15 +328,11 @@ async fn main() -> std::io::Result<()> {
     print!("{contents}");
 
     Ok(())
-}
-
-</code></pre>
+}</code></pre>
 
 What's the strace looking like ?
 
-<pre><code class="language-rust">
-
-io_uring_setup(1024, .. ) = 4
+<pre><code class="language-plaintext">io_uring_setup(1024, .. ) = 4
 mmap(NULL, 65536, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_POPULATE, 4, 0x10000000) = 0xffffb1a60000
 mmap(NULL, 36928, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_POPULATE, 4, 0) = 0xffffb1c75000
 madvise(0xffffb1c75000, 36928, MADV_DONTFORK) = 0
@@ -375,16 +349,14 @@ io_uring_enter(4, 1, 1, IORING_ENTER_GETEVENTS|IORING_ENTER_NO_IOWAIT, NULL, 128
 io_uring_enter(4, 1, 1, IORING_ENTER_GETEVENTS|IORING_ENTER_NO_IOWAIT, NULL, 128) = 1
 write(1, "Hello from Compio!\n", 19Hello from Compio!
 )    = 19
-close(5)                                = 0
-
-</code></pre>
+close(5)                                = 0</code></pre>
 
 It has more io_uring_enter calls but less system calls overall.
 Tokio's file read implements tricks similar to rust's std file read method to probe read a file fully
 and allocate more space for it if needed.
 <p class="content"> 
 This is because we need to provide the number of bytes we want to read for 
-each io-uring submission and wait for that read request for let's say `N` bytes is completed, release 
+each io-uring submission and wait for that read request for let's say <code>N</code> bytes is completed, release 
 that memory and give it back to the caller.
 
 </p>
@@ -408,8 +380,7 @@ that memory and give it back to the caller.
                         Because of batching I'd like to use an API that's heading towards compio but with a builder-plan 
                         style type io.
 
-                        <pre><code class="language-rust">
-let mut io = Io::new();
+                        <pre><code class="language-rust">let mut io = Io::new();
 
 let file = io.file("foo.txt");
 
@@ -429,8 +400,7 @@ let result = io.submit().await?;</code></pre>
 
                     <p class="content">
                         I'm visioning O_DIRECT reads to look like 
-<pre><code class="language-rust">
-let file = io.file("huge.dat")
+<pre><code class="language-rust">let file = io.file("huge.dat")
     .read_only()
     .direct();
 
@@ -456,7 +426,7 @@ let (result, pool) = io.submit(pool).await?;
 
 let buf = pool.buffer(3);
 
-println!("{:?}", &buf[..result.bytes(read)?]);                        </code></pre>
+println!("{:?}", &buf[..result.bytes(read)?]);</code></pre>
 
                     </p>
                     <p class="content">
@@ -492,7 +462,7 @@ println!("{:?}", &buf[..result.bytes(read)?]);                        </code></p
             </div>
         </main>
     </div>
-    <script src="./assets/scripts/bundle.js"></script>
+    <script src="../assets/scripts/bundle.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             swetrix.init('QgzKhY7hDGrm');
