@@ -234,11 +234,10 @@ write(4, "\1\0\0\0\0\0\0\0", 8)         = 8
                         using `IORING_OP_POLL_ADD`
                     </p>
                     <p class="content">
-                        io-uring addition today allows you to do non blocking asyncronous File I/O.
+                        io-uring addition today allows you to do non blocking async File I/O.
                         
-                        The tokio ecosystem is still deciding what that API will look like. Today we have a number of new runtimes 
-                        who's APIs are worth looking at, this creates a very fragmented ecosystem though.
-
+                        The tokio ecosystem is still deciding what the final io-uring API will look like. Windows had io-uring
+                        equivalent support available. The windows specific code is mostly in <code>mio</code>
                     </p>
                     <p class="content">
 
