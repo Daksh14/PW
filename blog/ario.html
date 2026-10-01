@@ -257,8 +257,8 @@ write(4, "\1\0\0\0\0\0\0\0", 8)         = 8
                     </p>
                     <p class="content">
 
-                        There's also registered buffers which is different from provided buffers. You have to give the ownership to the kernel for the file descriptors
-                        at least and make sure your buffer is not dropped until the CQE arrives because the kernel can write to it anytime.
+                        There's also registered buffers which is different from provided buffers. You give the ownership of your file descriptor
+                        and your buffer until you reap the completion queue from the ring.
 
                         This creates a different API, this is how tokio's io-uring internals look like and interestingly, Compio's API 
 
