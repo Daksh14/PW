@@ -127,6 +127,10 @@
                         <span class="color-7">Completion based IO vs Readiness based IO</span>
                     </p>
                     <hr />
+                    <blockquote class="skip-to">
+                        Skip to the bottom to check the final API
+                        <a href="#final-api" class="skip-link"><span>Jump to API &darr;</span></a>
+                    </blockquote>
                     <p class="content">
                         Reading files / Listening to sockets in userspace programs written for 
                         linux is done through system calls.
@@ -376,7 +380,7 @@ that memory and give it back to the caller.
                     </p>
 
 
-                    <p class="content"> 
+                    <p class="content" id="final-api">
                         Because of batching I'd like to use an API that's heading towards compio but with a builder-plan 
                         style type io.
 
@@ -434,6 +438,80 @@ println!("{:?}", &buf[..result.bytes(read)?]);</code></pre>
                         So is everyone just doing file I/O with io-uring what about sockets? there are some nice optimizations that come with sockets 
                         but first we should finalize on an API to support completion based I/O with a work 
                         stealing battle tested runtime on tokio_unstable. More on sockets soon
+                    </p>
+
+                    <p class="content">
+                        <blockquote>1st November Update</blockquote>
+                    </p>
+
+
+                    <p class="content">
+                        After a month, we decided to want to have callbacks instead to allow defined operations with io uring supported operations implemented in tokio internals. The work is in progress and API now looks more like
+                    </p>
+
+<pre><code class="language-rust">use std::io;
+use io_uring::cqueue;
+use tokio::sync::oneshot;
+use tokio::io::uring::{bytes, CompletionAction, FixedPool, Handle, Op, Ops, Submission};
+
+struct ReadHuge {
+    pool: FixedPool,
+    read: Op,
+    n: io::Result<usize>, // overwritten by the read's CQE, even a cancelled one
+    tx: oneshot::Sender<(io::Result<usize>, FixedPool)>,
+}
+
+unsafe fn on_read(io: &mut Submission<'_>, cqe: cqueue::Entry, data: *mut ()) -> CompletionAction {
+    let st = unsafe { &mut *data.cast::<ReadHuge>() };
+
+    if Op::of(&cqe) == st.read {
+        // ECANCELED here means the open failed and the soft link cut the chain.
+        st.n = bytes(&cqe);
+    }
+
+    if io.in_flight() == 0 {
+        // Last CQE of the chain: send back the result and the pool, then free the state.
+        let ReadHuge { pool, n, tx, .. } = *unsafe { Box::from_raw(data.cast::<ReadHuge>()) };
+        let _ = tx.send((n, pool));
+    }
+
+    CompletionAction::Remove
+}
+
+#[tokio::main]
+async fn main() -> io::Result<()> {
+    let mut io = Handle::current();
+
+    let file = io.file("huge.dat").read_only().direct();
+
+    let pool = FixedPool::new()
+        .entries(64)
+        .buffer_size(256 * 1024);
+
+    let open = io.open(file);
+
+    let read = io.read_fixed(
+        file,
+        pool.buffer(3),
+        4 * 1024 * 1024,
+        256 * 1024,
+    );
+
+    let close = io.close(file);
+
+    io.soft_link([open, read])
+      .hard_link([read, close]);
+
+    let (tx, rx) = oneshot::channel();
+    let st = Box::new(ReadHuge { pool, read, n: Ok(0), tx });
+    unsafe { io.submit(on_read, Box::into_raw(st).cast()) }?;
+
+    let (n, pool) = rx.await.expect("callback always replies");
+
+    println!("{:?}", &pool.buffer(3)[..n?]);
+    Ok(())
+}
+</code></pre>
 
 
                     <hr />

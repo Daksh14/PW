@@ -50,7 +50,7 @@
     .heading {
         margin: 0 0 2.5rem;
         font-family: $font-display;
-        font-size: clamp(2.6rem, 8vw, 6rem);
+        font-size: clamp(2.2rem, 6vw, 4.5rem);
         font-weight: 900;
         font-variation-settings: 'wdth' 120;
         line-height: 0.92;
@@ -65,6 +65,50 @@
 
     p {
         margin: 0 0 1.4rem;
+    }
+
+    blockquote {
+        margin: 0 0 1.75rem;
+        padding: 1rem 1.25rem;
+        border-left: 4px solid $accent;
+        background: $surface;
+        color: $fg;
+
+        &.skip-to {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem 1.5rem;
+        }
+    }
+
+    // Jump button in the "skip to the bottom" blockquote
+    .skip-link {
+        flex-shrink: 0;
+        padding: 0.4rem 0.9rem;
+        border: 2px solid $accent;
+        font-family: $font-mono;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        line-height: 1.6;
+        transition: background-color 0.2s $ease;
+
+        span { color: $accent; transition: color 0.2s $ease; }
+
+        &:hover,
+        &:focus-visible {
+            background: $accent;
+
+            span { color: $bg; }
+        }
+    }
+
+    // Keep anchored sections clear of the sticky header
+    [id] {
+        scroll-margin-top: 80px;
     }
 
     .content {
@@ -131,6 +175,9 @@
             font-size: inherit;
             overflow-x: visible;
         }
+
+        // Theme comment color (#4C566A) disappears against $surface
+        .hljs-comment { color: $text-muted; }
     }
 
     video {

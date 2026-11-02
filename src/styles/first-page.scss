@@ -63,8 +63,9 @@
     column-gap: clamp(2rem, 5vw, 5rem);
     row-gap: clamp(2.5rem, 6vh, 4rem);
     align-items: end;
-    padding-top: clamp(1.5rem, 4vh, 2.5rem);
-    border-top: 2px solid $fg;
+    margin-bottom: clamp(2rem, 6vh, 4rem);
+    padding-bottom: clamp(1.5rem, 4vh, 2.5rem);
+    border-bottom: 2px solid $fg;
 
     @include media-query($grid-bp) {
         grid-template-columns: minmax(0, 1fr);
@@ -75,6 +76,7 @@
 
     .profile {
         grid-area: profile;
+        align-self: center;
     }
 
     .links {
@@ -114,12 +116,11 @@
     }
 }
 
-// Blog list on the home page — a full-bleed white band
+// Blog list at the top of the home page — a full-bleed band
 .first-page-blog {
     @extend %band;
-    margin-top: clamp(4rem, 10vh, 7rem);
-    padding-top: clamp(3rem, 8vh, 5rem);
-    padding-bottom: clamp(3rem, 8vh, 5rem);
+    padding-top: clamp(1.75rem, 5vh, 3rem);
+    padding-bottom: clamp(1.75rem, 5vh, 3rem);
     --band-bg: #{$surface};
     background: var(--band-bg);
     color: $fg;
@@ -127,7 +128,8 @@
     .section-eyebrow { color: $accent; }
 
     .main-text {
-        margin: 0 0 clamp(1.5rem, 4vh, 3rem);
+        margin: 0.75rem 0 clamp(1rem, 2.5vh, 1.75rem);
+        font-size: clamp(1.5rem, 3vw, 2.5rem);
         color: $fg;
     }
 
@@ -148,9 +150,9 @@
             display: flex;
             align-items: center;
             gap: clamp(1rem, 3vw, 2.5rem);
-            padding: clamp(1.25rem, 3vh, 2rem) clamp(0.75rem, 2vw, 1.5rem);
+            padding: clamp(0.85rem, 2vh, 1.25rem) clamp(0.75rem, 2vw, 1.5rem);
             @extend %display;
-            font-size: clamp(1.4rem, 3.6vw, 3.25rem);
+            font-size: clamp(1.1rem, 2.2vw, 1.75rem);
             line-height: 1;
             color: $fg;
             --fill: #{$accent};
@@ -159,7 +161,7 @@
             > .num {
                 flex-shrink: 0;
                 font-family: $font-mono;
-                font-size: 0.4em;
+                font-size: 0.6em;
                 font-weight: 700;
                 color: $accent;
             }

@@ -203,17 +203,20 @@ main .first-page-blog {
   box-shadow: 0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3);
   transition: border-color 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s cubic-bezier(0.2, 0, 0, 1), transform 0.3s cubic-bezier(0.2, 0, 0, 1);
 }
+.profile a {
+  display: block;
+}
 .profile img {
   display: block;
   width: 100%;
   filter: grayscale(1) contrast(1.15);
   transition: filter 0.4s cubic-bezier(0.2, 0, 0, 1);
 }
-.profile:hover {
+.profile:hover, .profile:focus-within {
   border-color: #88C0D0;
   box-shadow: 0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3);
 }
-.profile:hover img {
+.profile:hover img, .profile:focus-within img {
   filter: none;
 }
 @media (max-width: 940px) {
@@ -415,8 +418,9 @@ main .intro-para {
   column-gap: clamp(2rem, 5vw, 5rem);
   row-gap: clamp(2.5rem, 6vh, 4rem);
   align-items: end;
-  padding-top: clamp(1.5rem, 4vh, 2.5rem);
-  border-top: 2px solid #ECEFF4;
+  margin-bottom: clamp(2rem, 6vh, 4rem);
+  padding-bottom: clamp(1.5rem, 4vh, 2.5rem);
+  border-bottom: 2px solid #ECEFF4;
 }
 @media (max-width: 940px) {
   main .intro-para {
@@ -426,6 +430,7 @@ main .intro-para {
 }
 main .intro-para .profile {
   grid-area: profile;
+  align-self: center;
 }
 main .intro-para .links {
   grid-area: links;
@@ -456,9 +461,8 @@ main .intro-para .links a:hover > .arrow {
   transform: translate(4px, -4px);
 }
 main .first-page-blog {
-  margin-top: clamp(4rem, 10vh, 7rem);
-  padding-top: clamp(3rem, 8vh, 5rem);
-  padding-bottom: clamp(3rem, 8vh, 5rem);
+  padding-top: clamp(1.75rem, 5vh, 3rem);
+  padding-bottom: clamp(1.75rem, 5vh, 3rem);
   --band-bg: #3B4252;
   background: var(--band-bg);
   color: #ECEFF4;
@@ -467,7 +471,8 @@ main .first-page-blog .section-eyebrow {
   color: #88C0D0;
 }
 main .first-page-blog .main-text {
-  margin: 0 0 clamp(1.5rem, 4vh, 3rem);
+  margin: 0.75rem 0 clamp(1rem, 2.5vh, 1.75rem);
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
   color: #ECEFF4;
 }
 main .first-page-blog ul {
@@ -485,8 +490,8 @@ main .first-page-blog li a {
   display: flex;
   align-items: center;
   gap: clamp(1rem, 3vw, 2.5rem);
-  padding: clamp(1.25rem, 3vh, 2rem) clamp(0.75rem, 2vw, 1.5rem);
-  font-size: clamp(1.4rem, 3.6vw, 3.25rem);
+  padding: clamp(0.85rem, 2vh, 1.25rem) clamp(0.75rem, 2vw, 1.5rem);
+  font-size: clamp(1.1rem, 2.2vw, 1.75rem);
   line-height: 1;
   color: #ECEFF4;
   --fill: #88C0D0;
@@ -495,7 +500,7 @@ main .first-page-blog li a {
 main .first-page-blog li a > .num {
   flex-shrink: 0;
   font-family: "Roboto Mono", ui-monospace, monospace;
-  font-size: 0.4em;
+  font-size: 0.6em;
   font-weight: 700;
   color: #88C0D0;
 }
@@ -510,6 +515,9 @@ main .first-page-blog li a:hover > .num, main .first-page-blog li a:hover > .arr
 }
 main .first-page-blog li a:hover > .arrow {
   transform: translateX(8px);
+}
+main .second-page {
+  padding-top: 0;
 }
 main .second-page h2 {
   margin: 0 0 clamp(1.5rem, 4vh, 3rem);
@@ -724,7 +732,7 @@ main .blog-post > div > p.duration {
 main .blog-post .heading {
   margin: 0 0 2.5rem;
   font-family: "Roboto Flex", "Roboto", system-ui, -apple-system, sans-serif;
-  font-size: clamp(2.6rem, 8vw, 6rem);
+  font-size: clamp(2.2rem, 6vw, 4.5rem);
   font-weight: 900;
   font-variation-settings: "wdth" 120;
   line-height: 0.92;
@@ -737,6 +745,45 @@ main .blog-post hr {
 }
 main .blog-post p {
   margin: 0 0 1.4rem;
+}
+main .blog-post blockquote {
+  margin: 0 0 1.75rem;
+  padding: 1rem 1.25rem;
+  border-left: 4px solid #88C0D0;
+  background: #3B4252;
+  color: #ECEFF4;
+}
+main .blog-post blockquote.skip-to {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+}
+main .blog-post .skip-link {
+  flex-shrink: 0;
+  padding: 0.4rem 0.9rem;
+  border: 2px solid #88C0D0;
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.6;
+  transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+main .blog-post .skip-link span {
+  color: #88C0D0;
+  transition: color 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+main .blog-post .skip-link:hover, main .blog-post .skip-link:focus-visible {
+  background: #88C0D0;
+}
+main .blog-post .skip-link:hover span, main .blog-post .skip-link:focus-visible span {
+  color: #2E3440;
+}
+main .blog-post [id] {
+  scroll-margin-top: 80px;
 }
 main .blog-post .content {
   font-weight: 450;
@@ -799,6 +846,9 @@ main .blog-post pre code, main .blog-post pre code.hljs {
   background: transparent;
   font-size: inherit;
   overflow-x: visible;
+}
+main .blog-post pre .hljs-comment {
+  color: rgba(236, 239, 244, 0.64);
 }
 main .blog-post video {
   display: block;

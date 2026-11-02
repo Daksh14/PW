@@ -1,4 +1,7 @@
 .second-page {
+  // The hero's bottom padding already separates this from the copy above
+  padding-top: 0;
+
   h2 {
     @extend %display;
     margin: 0 0 clamp(1.5rem, 4vh, 3rem);
