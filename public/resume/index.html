@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Resume of Daksh Upadhyay, Rust and systems engineer in New York City. Tokio maintainer, previously Staff Software Engineer at Profound and Software Engineer at Dusk Network.">
+  <meta name="author" content="Daksh Upadhyay">
+  <link rel="canonical" href="https://dakshu.xyz/resume/">
+  <meta property="og:title" content="Daksh Upadhyay | Resume">
+  <meta property="og:description" content="Rust and systems engineer in New York City. Tokio maintainer, previously Profound and Dusk Network.">
+  <meta property="og:type" content="profile">
+  <meta property="og:url" content="https://dakshu.xyz/resume/">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#2E3440">
+
+  <title>Daksh Upadhyay | Resume</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --night: #2E3440;
+      --snow: #ECEFF4;
+      --snow-2: #D8DEE9;
+      --paper: #FAFBFC;
+      --ink: #2E3440;
+      --ink-soft: #3B4252;
+      --muted: #5B6578;
+      --frost: #88C0D0;
+      --frost-deep: #5E81AC;
+      --rule: #C7CFDB;
+      --ease: cubic-bezier(0.2, 0, 0, 1);
+      --sheet-w: min(100% - 2rem, 980px);
+      --radius: 36px;
+      --sans: 'Roboto Flex', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      background: var(--night);
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: var(--sans);
+      font-size: 1rem;
+      color: var(--ink);
+      background:
+        radial-gradient(1100px 480px at 50% -12%, rgba(136, 192, 208, 0.18), transparent 70%),
+        var(--night);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Bar above the sheet */
+    .topbar {
+      width: var(--sheet-w);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: clamp(1.25rem, 6vh, 3.5rem) 0.25rem 1.25rem;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .topbar a {
+      color: var(--snow-2);
+      transition: color 0.2s var(--ease);
+    }
+
+    .topbar a:hover,
+    .topbar a:focus-visible { color: var(--frost); }
+
+    .save {
+      padding: 0.55rem 1rem;
+      border: 1.5px solid rgba(236, 239, 244, 0.35);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--snow);
+      font: inherit;
+      letter-spacing: inherit;
+      text-transform: inherit;
+      cursor: pointer;
+      transition: background 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease);
+    }
+
+    .save:hover,
+    .save:focus-visible {
+      background: var(--frost);
+      border-color: var(--frost);
+      color: var(--night);
+    }
+
+    /* The sheet: rounded card with space below it */
+    .sheet {
+      width: var(--sheet-w);
+      margin-bottom: clamp(1.5rem, 6vh, 3.5rem);
+      padding: clamp(2rem, 4.5vw, 3.25rem) clamp(1.5rem, 4vw, 3rem);
+      background: var(--paper);
+      border-radius: var(--radius);
+      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.3);
+      animation: rise 0.7s var(--ease) both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(28px); }
+    }
+
+    /* Header: name + one contact line, like the PDF */
+    .name {
+      margin: 0;
+      font-size: clamp(1.75rem, 3.4vw, 2.25rem);
+      font-weight: 900;
+      font-variation-settings: 'wdth' 115;
+      line-height: 1;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      color: var(--night);
+    }
+
+    .contact {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      margin: 0.6rem 0 0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .contact .sep {
+      margin: 0 0.45rem;
+      color: var(--rule);
+    }
+
+    .contact a {
+      color: var(--ink-soft);
+      transition: color 0.2s var(--ease);
+    }
+
+    .contact a:hover,
+    .contact a:focus-visible {
+      color: var(--frost-deep);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* Sections: title with a rule underneath */
+    .section { margin-top: 1.9rem; }
+
+    .section-title {
+      margin: 0 0 0.9rem;
+      padding-bottom: 0.3rem;
+      border-bottom: 1.5px solid var(--rule);
+      font-size: 1.2rem;
+      font-weight: 750;
+      font-variation-settings: 'wdth' 108;
+      color: var(--night);
+    }
+
+    /* Jobs */
+    .job { break-inside: avoid; }
+    .job + .job { margin-top: 1.25rem; }
+
+    .company {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--night);
+    }
+
+    .company a:hover,
+    .company a:focus-visible {
+      color: var(--frost-deep);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0 1rem;
+      margin: 0.1rem 0 0.4rem;
+      color: var(--frost-deep);
+      font-size: 0.97rem;
+      font-weight: 500;
+    }
+
+    .dates {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .job ul {
+      margin: 0;
+      padding-left: 1.1rem;
+    }
+
+    .job li {
+      margin: 0.18rem 0;
+      padding-left: 0.15rem;
+      font-size: 0.9375rem;
+      line-height: 1.55;
+      color: var(--ink-soft);
+    }
+
+    .job li::marker { color: var(--frost); }
+
+    /* Skills */
+    .skills { margin: 0; }
+
+    .skills p {
+      margin: 0 0 0.3rem;
+      font-size: 0.9375rem;
+      line-height: 1.55;
+      color: var(--ink-soft);
+    }
+
+    .skills strong {
+      font-weight: 700;
+      color: var(--night);
+    }
+
+    .edu .company { font-weight: 700; }
+
+    .edu .meta { margin-bottom: 0; }
+
+    @media (max-width: 640px) {
+      :root {
+        --sheet-w: 100%;
+        --radius: 26px;
+      }
+
+      .topbar { padding-inline: 1.25rem; }
+
+      .contact { gap: 0.1rem 1rem; }
+
+      .contact .sep { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .sheet { animation: none; }
+    }
+
+    /* Print / Save as PDF: plain, one page */
+    @media print {
+      @page { size: letter; margin: 0.4in 0.5in; }
+
+      html { font-size: 12px; }
+
+      html, body { background: #fff; }
+
+      body { display: block; min-height: 0; }
+
+      .topbar { display: none; }
+
+      .sheet {
+        width: auto;
+        margin: 0;
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+        background: #fff;
+        animation: none;
+      }
+
+      .section { margin-top: 1.3rem; }
+
+      .section-title { margin-bottom: 0.7rem; }
+
+      .job + .job { margin-top: 0.95rem; }
+
+      .job li { margin: 0.1rem 0; line-height: 1.45; }
+
+      .skills p { margin-bottom: 0.2rem; line-height: 1.45; }
+
+      * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-94FNY2KKSH"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-94FNY2KKSH');
+  </script>
+  <script src="https://swetrix.org/swetrix.js" defer></script>
+</head>
+
+<body>
+  <nav class="topbar" aria-label="Page">
+    <a href="/">&larr; dakshu.xyz</a>
+    <button class="save" type="button" onclick="window.print()">Save as PDF</button>
+  </nav>
+
+  <main class="sheet">
+    <header>
+      <h1 class="name">Daksh Upadhyay</h1>
+      <p class="contact">
+        <span>New York City</span><span class="sep" aria-hidden="true">|</span><a href="https://mailhide.io/e/pcelTq87">Email</a><span class="sep" aria-hidden="true">|</span><a href="https://github.com/Daksh14">github.com/Daksh14</a><span class="sep" aria-hidden="true">|</span><a href="https://www.linkedin.com/in/daksh-upadhyay-94a817243/">LinkedIn</a>
+      </p>
+    </header>
+
+    <section class="section" aria-labelledby="experience">
+      <h2 class="section-title" id="experience">Experience</h2>
+
+      <article class="job">
+        <h3 class="company"><a href="https://github.com/tokio-rs/tokio">Tokio</a></h3>
+        <p class="meta"><span>Open Source Maintainer</span></p>
+        <ul>
+          <li>Bring true asynchronous file IO with io_uring by adding file reading io_uring operations on to Tokio.</li>
+          <li>Strengthen correctness in io_uring completion handling and recovery around EINTR during read/write operations.</li>
+          <li>Authored the SetOnce sync primitive dealing with waking, synchronization, atomics, and memory-ordering concerns.</li>
+          <li>Actively review PRs and approve for merging.</li>
+        </ul>
+      </article>
+
+      <article class="job">
+        <h3 class="company">Profound</h3>
+        <p class="meta"><span>Staff Software Engineer</span><span class="dates"><time datetime="2026-01">Jan 2026</time> &ndash; <time datetime="2026-08">Aug 2026</time></span></p>
+        <ul>
+          <li>Led development of an Agentic CMS for Profound.</li>
+          <li>Led 2 backend engineers and 2 frontend engineers; CI/CD workflow with AWS CodePipeline/CodeBuild.</li>
+          <li>Provisioned EC2/EIP AWS infrastructure with Terraform. EKS clusters for scaling services horizontally.</li>
+          <li>LLM inference via TensorZero gateway for prompting OpenAI/Gemini/Anthropic models.</li>
+          <li>Rust MCP server on AWS EC2 for Claude Code/Cursor workflows with our Agentic CMS.</li>
+          <li>Ensured Sentry based observability and telemetry/reliability alerts for our services.</li>
+          <li>Established code review culture, emphasis on documentation and best practices.</li>
+        </ul>
+      </article>
+
+      <article class="job">
+        <h3 class="company">Dusk Network</h3>
+        <p class="meta"><span>Software Engineer</span><span class="dates"><time datetime="2022-12">Dec 2022</time> &ndash; <time datetime="2025-12">Dec 2025</time></span></p>
+        <ul>
+          <li>Reduced wallet sync and cold-start time by ~30% by replacing cache paths with RocksDB and zero-copy rkyv serialization.</li>
+          <li>Criterion benchmarks and flamegraphs to identify hot paths and guide performance optimization.</li>
+          <li>Architected a Rust-WASM FFI layer with manual memory management and custom serialization across the WASM/JS boundary.</li>
+          <li>WebAssembly runtime in browser Web Workers for parallel execution and secure sandboxed sensitive operations.</li>
+          <li>Delivered against a fixed product milestone, releasing Dusk&rsquo;s wallet entirely in the browser.</li>
+        </ul>
+      </article>
+
+      <article class="job">
+        <h3 class="company">KeepWorks</h3>
+        <p class="meta"><span>Backend Software Engineer</span><span class="dates"><time datetime="2020-12">Dec 2020</time> &ndash; <time datetime="2022-03">Mar 2022</time></span></p>
+        <ul>
+          <li>Built a Rust procedural macro that automated server-side sanitization across ~200 data structures.</li>
+          <li>Integrated tonic gRPC and async-graphql services with YugabyteDB/PostgreSQL, DB migrations, and shared Rust infrastructure.</li>
+          <li>Built GitHub Actions CI/CD and automated deployment to AWS EC2.</li>
+          <li>Improved integration across our internal GraphQL and gRPC microservices.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="section" aria-labelledby="skills">
+      <h2 class="section-title" id="skills">Technical Skills</h2>
+      <div class="skills">
+        <p><strong>Languages:</strong> Rust, C/C++, Python, JavaScript/TypeScript, SQL</p>
+        <p><strong>Rust / Async:</strong> Tokio, async/await, Futures, mio, io_uring, epoll, no_std, FFI, WebAssembly/WASM</p>
+        <p><strong>Systems:</strong> TCP/IP, sockets, syscalls, concurrency, multithreading, atomics, memory ordering, zero-copy I/O</p>
+        <p><strong>Linux:</strong> Linux internals, kernel/userspace boundary, eBPF/XDP concepts, memory management, cache behavior</p>
+        <p><strong>Performance:</strong> perf, flamegraphs, Criterion, tracing/profiling, latency and throughput optimization</p>
+        <p><strong>Backend:</strong> Axum, tonic/gRPC, async-graphql/GraphQL, REST APIs, distributed systems</p>
+        <p><strong>Data:</strong> PostgreSQL, YugabyteDB, RocksDB, rkyv</p>
+        <p><strong>Cloud / Infra:</strong> AWS, EC2, EKS, S3, Terraform, Docker, Kubernetes, GitHub Actions, CI/CD, GCP Cloud Run, observability</p>
+      </div>
+    </section>
+
+    <section class="section edu" aria-labelledby="education">
+      <h2 class="section-title" id="education">Education</h2>
+      <h3 class="company">Pennsylvania State University</h3>
+      <p class="meta"><span>B.S. Computer Science</span></p>
+    </section>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.swetrix) {
+        swetrix.init('QgzKhY7hDGrm')
+        swetrix.trackViews()
+      }
+    })
+  </script>
+  <noscript>
+    <img src="https://api.swetrix.com/log/noscript?pid=QgzKhY7hDGrm" alt="" referrerpolicy="no-referrer-when-downgrade">
+  </noscript>
+</body>
+</html>
