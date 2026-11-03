@@ -136,6 +136,9 @@
                         linux is done through system calls.
                     </p>
                     <p class="content">
+                        Files don't work with <code>epoll</code> and similar APIs, so it falls back to blocking file IO on a thread pool.
+                    </p>
+                    <p class="content">
                         <code>epoll</code> is a readiness based event notification we have been using, io-uring came in linux
                         5.1, it works using shared memory mapped ring buffers between the userspace
                         and kernel-space. To do I/O,<br> "submit" an I/O request to the kernel, after some time, you 
