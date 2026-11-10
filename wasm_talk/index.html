@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="wasm_zero and developing with WASM targets: a talk by Daksh Upadhyay on Rust WebAssembly targets, the FFI boundary, zero-copy rkyv serialisation, Exu and WASI.">
+  <meta name="author" content="Daksh Upadhyay">
+  <link rel="canonical" href="https://dakshu.xyz/wasm_talk/">
+  <meta property="og:title" content="wasm_zero and developing with WASM targets">
+  <meta property="og:description" content="A talk on Rust WebAssembly targets, the FFI boundary, zero-copy serialisation with rkyv, Exu and WASI.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dakshu.xyz/wasm_talk/">
+  <meta property="og:image" content="https://dakshu.xyz/wasm_talk/slides/01.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#2E3440">
+
+  <title>wasm_zero | Daksh Upadhyay</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --night: #2E3440;
+      --night-2: #3B4252;
+      --snow: #ECEFF4;
+      --snow-2: #D8DEE9;
+      --paper: #FAFBFC;
+      --ink: #2E3440;
+      --ink-soft: #3B4252;
+      --muted: #5B6578;
+      --muted-dark: #9AA5B8;
+      --frost: #88C0D0;
+      --frost-deep: #5E81AC;
+      --rule: #C7CFDB;
+      --ease: cubic-bezier(0.2, 0, 0, 1);
+      --sheet-w: min(100% - 2rem, 980px);
+      --radius: 36px;
+      --slide-radius: 22px;
+      --sans: 'Roboto Flex', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      background: var(--night);
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: var(--sans);
+      font-size: 1rem;
+      color: var(--ink);
+      background:
+        radial-gradient(1100px 480px at 50% -12%, rgba(136, 192, 208, 0.18), transparent 70%),
+        var(--night);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Bar above the sheet */
+    .topbar {
+      width: var(--sheet-w);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: clamp(1.25rem, 6vh, 3.5rem) 0.25rem 1.25rem;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .topbar a {
+      color: var(--snow-2);
+      transition: color 0.2s var(--ease);
+    }
+
+    .topbar a:hover,
+    .topbar a:focus-visible { color: var(--frost); }
+
+    .topbar .save {
+      padding: 0.55rem 1rem;
+      border: 1.5px solid rgba(236, 239, 244, 0.35);
+      border-radius: 999px;
+      color: var(--snow);
+      transition: background 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease);
+    }
+
+    .topbar .save:hover,
+    .topbar .save:focus-visible {
+      background: var(--frost);
+      border-color: var(--frost);
+      color: var(--night);
+    }
+
+    /* Title card */
+    .sheet {
+      width: var(--sheet-w);
+      padding: clamp(2rem, 4.5vw, 3.25rem) clamp(1.5rem, 4vw, 3rem);
+      background: var(--paper);
+      border-radius: var(--radius);
+      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.3);
+      animation: rise 0.7s var(--ease) both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(28px); }
+    }
+
+    .kicker {
+      margin: 0 0 0.8rem;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--frost-deep);
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(1.75rem, 4.2vw, 2.75rem);
+      font-weight: 900;
+      font-variation-settings: 'wdth' 112;
+      line-height: 1.05;
+      color: var(--night);
+      overflow-wrap: anywhere;
+    }
+
+    .lede {
+      margin: 0.9rem 0 0;
+      max-width: 62ch;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      margin: 1rem 0 0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .meta .sep {
+      margin: 0 0.45rem;
+      color: var(--rule);
+    }
+
+    .meta a {
+      color: var(--ink-soft);
+      transition: color 0.2s var(--ease);
+    }
+
+    .meta a:hover,
+    .meta a:focus-visible {
+      color: var(--frost-deep);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* Slides */
+    main {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .deck {
+      width: var(--sheet-w);
+      margin: clamp(1.5rem, 4vh, 2.5rem) 0 clamp(1.5rem, 6vh, 3.5rem);
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: clamp(1.75rem, 4vh, 2.75rem);
+    }
+
+    .slide {
+      margin: 0;
+      animation: rise 0.7s var(--ease) both;
+      animation-delay: 0.08s;
+    }
+
+    .slide img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--slide-radius);
+      background: #000;
+      box-shadow: 0 0 0 1px rgba(236, 239, 244, 0.08), 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    .slide figcaption {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.25rem 0.9rem;
+      padding: 0.8rem 0.35rem 0;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: var(--snow-2);
+    }
+
+    .slide .num {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--frost);
+    }
+
+    .slide figcaption a {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      color: var(--muted-dark);
+      transition: color 0.2s var(--ease);
+    }
+
+    .slide figcaption a:hover,
+    .slide figcaption a:focus-visible {
+      color: var(--frost);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    @media (max-width: 640px) {
+      :root {
+        --sheet-w: 100%;
+        --radius: 26px;
+        --slide-radius: 14px;
+      }
+
+      .topbar { padding-inline: 1.25rem; }
+
+      .deck { padding-inline: 1rem; }
+
+      .meta { gap: 0.1rem 1rem; }
+
+      .meta .sep { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .sheet, .slide { animation: none; }
+    }
+
+    @media print {
+      @page { size: landscape; margin: 0.4in; }
+
+      html, body { background: #fff; }
+
+      body { display: block; min-height: 0; }
+
+      .topbar { display: none; }
+
+      .sheet {
+        width: auto;
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+        background: #fff;
+        animation: none;
+      }
+
+      .deck { width: auto; display: block; margin: 0; }
+
+      .slide {
+        break-before: page;
+        animation: none;
+      }
+
+      .slide img { border-radius: 0; box-shadow: none; }
+
+      .slide figcaption { color: var(--ink); }
+
+      * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-94FNY2KKSH"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-94FNY2KKSH');
+  </script>
+  <script src="https://swetrix.org/swetrix.js" defer></script>
+</head>
+
+<body>
+  <nav class="topbar" aria-label="Page">
+    <a href="/">&larr; dakshu.xyz</a>
+    <a class="save" href="wasm_talk.pdf" download="wasm_talk.pdf">Download PDF</a>
+  </nav>
+
+  <header class="sheet">
+    <p class="kicker">Talk &middot; 11 slides</p>
+    <h1 class="title">wasm_zero and developing with WASM&nbsp;targets</h1>
+    <p class="lede">Rust&rsquo;s WebAssembly targets and what each is for, a crypto wallet that runs entirely in the browser, crossing the FFI boundary by hand, zero-copy serialisation with rkyv, and running WASM as parallel, isolated tasks with Exu.</p>
+    <p class="meta">
+      <span>Daksh Upadhyay</span><span class="sep" aria-hidden="true">|</span><a href="https://github.com/dusk-network/exu">dusk-network/exu</a><span class="sep" aria-hidden="true">|</span><a href="https://github.com/dusk-network/rusk">dusk-network/rusk</a>
+    </p>
+  </header>
+
+  <main>
+    <ol class="deck" aria-label="Slides">
+      <li>
+        <figure class="slide">
+          <img src="slides/01.webp" width="1600" height="900" alt="Title slide: wasm_zero and developing with WASM targets.">
+          <figcaption><span class="num">01</span><span>wasm_zero and developing with WASM targets</span></figcaption>
+        </figure>
+      </li>
+      <li>
+        <figure class="slide">
+          <img src="slides/02.webp" width="1600" height="900" alt="WASM targets. Each target has its own use case: wasm32-unknown-unknown; wasm32-unknown-emscripten, similar to above, emits JS glue code; wasm32-wasi / wasm32-wasip1, first preview of components; wasm32-wasip1-threads, on top of wasip1 but threads; wasm32-wasip2, http and async IO on top of wasip1; wasm32-wali-linux-musl, Linux syscalls in WASM; wasm64-unknown-unknown.">
+          <figcaption><span class="num">02</span><span>WASM targets</span></figcaption>
+        </figure>
+      </li>
+      <li>
+        <figure class="slide">
+          <img src="slides/03.webp" width="1600" height="900" alt="Problem statement: a crypto wallet that's entirely on the frontend browser. Spawn a web worker in the browser. Instantiate your crypto WebAssembly logic inside the web worker. Call functions like generate_private_key from a bip39 mnemonic and keep the seed in sandboxed memory. Then call functions like get_balance and transfer, which give you blob tx data ready to send to the node network. Drop the worker, and the WASM memory is destroyed along with it." loading="lazy" decoding="async">
+          <figcaption><span class="num">03</span><span>Problem statement</span></figcaption>
+        </figure>
+      </li>
+      <li>
+        <figure class="slide">
+          <img src="slides/04.webp" width="1600" height="900" alt="wasm32-unknown-unknown, a limited target. Code: an unsafe no_mangle extern &quot;C&quot; fn balance taking a seed, an index, a notes pointer and a mutable 16-byte balance_info pointer, returning an ErrorCode. It derives the phoenix view key, reads notes from the buffer, calculates the balance, and copies the bytes into balance_info_ptr with copy_nonoverlapping." loading="lazy" decoding="async">
+          <figcaption><span class="num">04</span><span>wasm32-unknown-unknown: a limited target</span><a href="https://github.com/dusk-network/rusk">github.com/dusk-network/rusk</a></figcaption>
+        </figure>
+      </li>
+      <li>
+        <figure class="slide">
+          <img src="slides/05.webp" width="1600" height="900" alt="Exu: run WebAssembly code as parallel, isolated and abortable functions in the JS engine. Screenshot of the Exu docs showing task-based bulk actions with module.task, and direct shared memory access using malloc, a Uint8Array over memory.buffer, and free." loading="lazy" decoding="async">
+          <figcaption><span class="num">05</span><span>Exu: parallel, isolated, abortable WASM in the JS engine</span><a href="https://github.com/dusk-network/exu">github.com/dusk-network/exu</a></figcaption>
+        </figure>
+      </li>
+      <li>
+        <figure class="slide">
+          <img src="slides/06.webp" width="1600" height="900" alt="Crossing the wasm to language boundary. This is the FFI boundary. Call malloc in Rust, which returns ptr and len. Use that on the Rust side in the allocated memory region to serialize a string or integer. Decode the string or integer on the JavaScript side." loading="lazy" decoding="async">
+          <figcaption><span class="num">06</span><span>Crossing the wasm &rarr; language boundary</span></figcaption>
+        </figure>
+      </li>
+      <li>
+        <figure class="slide">
+          <img src="slides/07.webp" width="1600" height="900" alt="Zero copy serialisation on the Rust side. rkyv allows zero copy serialisation and alignment for types that support it, only on the Rust side. Generate the type shape at compile time during WASM bytecode generation so the JavaScript side knows how to deserialise raw bytes using pointer arithmetic and TextDecoder calls, similar to the glue wasm-bindgen emits. We can use FFI on the JavaScript side with rkyv to decrease deserialisation cost (theoretical)." loading="lazy" decoding="async">
+          <figcaption><span class="num">07</span><span>Zero copy serialisation on the Rust side</span></figcaption>
+        </figure>
+      </li>
+      <li>
+        <figure class="slide">
+          <img src="slides/08.webp" width="1600" height="900" alt="wasm_zero: rkyv zero-copy serialisation on the Rust side, emitting only minimal decoding glue on the JS side. Code: a #[wasm_zero] pub fn get_adult_person returning a Person, and JS that awaits initWasmZero(&quot;app.wasm&quot;) and calls wasmzero.get_adult_person() to get name, age, email and scores. Less WASM bundle size emitted overall, faster decoding of primitives and complex objects, supports the WASI target, no_std and std both supported, use your own allocator." loading="lazy" decoding="async">
+          <figcaption><span class="num">08</span><span>wasm_zero</span></figcaption>
+        </figure>
+      </li>
+      <li>
+        <figure class="slide">
+          <img src="slides/09.webp" width="1600" height="900" alt="Exu plus wasm_zero (rayon with Exu). Code: create an Exu Module from wasm_zero_rayon.wasm, then run module.task, which gets a fresh sandbox and memory dropped when it resolves. Inside, initThreadPool with navigator.hardwareConcurrency spins up a rayon pool over the sandbox's shared memory, and __wasm_zero_parallel_count_primes(1_000_000) returns 78498 primes." loading="lazy" decoding="async">
+          <figcaption><span class="num">09</span><span>Exu + wasm_zero (rayon with Exu)</span></figcaption>
+        </figure>
+      </li>
+      <li>
+        <figure class="slide">
+          <img src="slides/10.webp" width="1600" height="900" alt="wasip3 target plus Tokio plus Toasty ORM on Spin. The Spin SDK allows writing http components." loading="lazy" decoding="async">
+          <figcaption><span class="num">10</span><span>wasip3 target + Tokio + Toasty ORM on Spin</span></figcaption>
+        </figure>
+      </li>
+      <li>
+        <figure class="slide">
+          <img src="slides/11.webp" width="1600" height="900" alt="Last frontier: engineer your own ABI. ABI compatibility is important for WASM modules. WASM modules are portable. Write them in C, C++, Rust or Go and instantiate them together. No extra code for ABI compatibility, reducing WASM sizes." loading="lazy" decoding="async">
+          <figcaption><span class="num">11</span><span>Last frontier: engineer your own ABI</span></figcaption>
+        </figure>
+      </li>
+    </ol>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.swetrix) {
+        swetrix.init('QgzKhY7hDGrm')
+        swetrix.trackViews()
+      }
+    })
+  </script>
+  <noscript>
+    <img src="https://api.swetrix.com/log/noscript?pid=QgzKhY7hDGrm" alt="" referrerpolicy="no-referrer-when-downgrade">
+  </noscript>
+</body>
+</html>
