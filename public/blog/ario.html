@@ -516,6 +516,99 @@ async fn main() -> io::Result<()> {
 }
 </code></pre>
 
+                    <p class="content">
+                        <blockquote>16th November Update</blockquote>
+                    </p>
+
+                    <p class="content">
+                        Callbacks are out. A callback could submit more operations from the completion path and contend on the ring,
+                        and a hand written op trait could deadlock if it was implemented wrong. <a class="underline" href="https://github.com/tokio-rs/tokio/pull/8778">tokio#8778</a>
+                        replaces them with <code>Ring</code>, a builder that collects operations and submits them all at once.
+                        <code>submit().await</code> gives back one <code>(io::Result&lt;usize&gt;, Option&lt;Vec&lt;u8&gt;&gt;)</code> per operation,
+                        in the order they were added, buffer included so a short read or write can be retried.
+                        <code>link()</code> runs the next operation only if the last one fully succeeded, <code>hard_link()</code> runs it regardless.
+                    </p>
+
+                    <p class="content">
+                        A fixed number of operations destructures into tuples with <code>try_into</code>, any number of them goes through <code>batch</code> and an iterator:
+                    </p>
+
+<pre><code class="language-rust">use std::{fs::File, io, sync::Arc};
+use tokio::io::uring::Ring;
+
+let file = Arc::new(File::options().read(true).write(true).open("data.bin")?);
+let mut ring = Ring::new();
+
+// Tuples: the sync runs only if the whole write succeeded.
+let done = ring
+    .write_at(file.clone(), b"abc".to_vec(), 0)
+    .link()
+    .sync_data(file.clone())
+    .submit()
+    .await;
+let [(written, _), (synced, _)]: [_; 2] = done.try_into().unwrap();
+written?;
+synced?;
+
+// Iterators: read the whole file in parallel chunks.
+const CHUNK: usize = 64 * 1024;
+let len = file.metadata()?.len();
+let contents = ring
+    .batch((0..len).step_by(CHUNK), |ring, offset| {
+        ring.read_at(file.clone(), Vec::with_capacity(CHUNK), offset)
+    })
+    .submit()
+    .await
+    .into_iter()
+    .map(|(read, buf)| read.map(|_| buf.unwrap()))
+    .collect::&lt;io::Result&lt;Vec&lt;_&gt;&gt;&gt;()?
+    .concat();</code></pre>
+
+                    <p class="content">
+                        Everything together: a header, a body, a sync and a read back per file, with every file written in parallel.
+                    </p>
+
+<pre><code class="language-rust">async fn write_files(files: &amp;[Arc&lt;File&gt;], header: &amp;[u8], body: &amp;[u8]) -&gt; io::Result&lt;()&gt; {
+    let expected = [header, body].concat();
+
+    let mut done = Ring::new()
+        .batch(files, |ring, f| {
+            ring.write_at(f.clone(), header.to_vec(), 0)
+                .link() // the body only if the whole header was written
+                .write_at(f.clone(), body.to_vec(), header.len() as u64)
+                .hard_link() // the sync even if the body failed or was short
+                .sync_all(f.clone())
+                .link() // the read back only once the sync succeeded
+                .read_at(f.clone(), Vec::with_capacity(expected.len()), 0)
+        })
+        .submit()
+        .await
+        .into_iter();
+
+    // Four completions per file, in the order they were added.
+    for _ in files {
+        let [(head, _), (rest, _), (synced, _), (read, buf)]: [_; 4] =
+            done.by_ref().take(4).collect::&lt;Vec&lt;_&gt;&gt;().try_into().unwrap();
+
+        // A failed or short header cancels the rest of its chain (ECANCELED).
+        if head? &lt; header.len() || rest? &lt; body.len() {
+            return Err(io::Error::other("short write"));
+        }
+        synced?;
+        read?;
+        if buf.unwrap() != expected {
+            return Err(io::Error::other("read back doesn't match"));
+        }
+    }
+    Ok(())
+}</code></pre>
+
+                    <p class="content">
+                        A <code>Ring</code> only holds pending operations and doesn't need a runtime to be built, so each spawned task makes its own.
+                        A submission bigger than the submission queue is split up automatically when nothing is linked; one with links has to fit in it.
+                        Dropping the <code>Submit</code> future doesn't cancel anything: buffers and file descriptors stay alive until the kernel is done with them.
+                    </p>
+
 
                     <hr />
                     <p>Links:</p>
@@ -531,6 +624,9 @@ async fn main() -> io::Result<()> {
                         </li>
                         <li>
                             <a class="underline" href="https://docs.rs/io_uring_buf_ring/latest/io_uring_buf_ring/">io uring buf ring utility</a>
+                        </li>
+                        <li>
+                            <a class="underline" href="https://github.com/tokio-rs/tokio/pull/8778">tokio#8778 — io-uring: ring data structure</a>
                         </li>
                     </ul>
                     <hr />
