@@ -64,7 +64,7 @@ a {
   outline-offset: 3px;
 }
 
-main .second-page .card h1, main .second-page h2, main .first-page-blog li a, main .hero-copy, .main-text {
+main .second-page .card h1, main .second-page h2, main .first-page-blog li a, .main-text {
   font-family: "Roboto Flex", "Roboto", system-ui, -apple-system, sans-serif;
   font-weight: 900;
   font-variation-settings: "wdth" 120;
@@ -178,14 +178,6 @@ body {
 main .first-page-blog {
   box-shadow: 0 0 0 100vmax var(--band-bg);
   clip-path: inset(0 -100vmax);
-}
-
-.fit {
-  display: block;
-  width: max-content;
-  max-width: none;
-  white-space: nowrap;
-  font-size: min(17vw, 15rem);
 }
 
 .main-text {
@@ -324,6 +316,23 @@ header .center-part a {
     font-size: 0.85rem;
   }
 }
+@media (max-width: 480px) {
+  header .center-part a {
+    padding: 0 0.5rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+  }
+}
+@media (max-width: 480px) {
+  header .parent {
+    gap: 0.75rem;
+  }
+}
+@media (max-width: 359px) {
+  header .right-part {
+    display: none;
+  }
+}
 header .right-part p {
   display: inline-flex;
   align-items: center;
@@ -375,41 +384,25 @@ main .first-page .main-text {
   font-size: clamp(1.75rem, 4.5vw, 4rem);
   line-height: 0.9;
 }
-main .hero {
+main .intro {
   display: flex;
   flex-direction: column;
-  gap: clamp(1rem, 3vh, 2rem);
-  min-height: calc(100vh - 68px - clamp(1.5rem, 5vh, 3.5rem));
-  min-height: calc(100svh - 68px - clamp(1.5rem, 5vh, 3.5rem));
-  padding-bottom: clamp(1.5rem, 4vh, 3rem);
+  gap: 0.75rem;
 }
-main .hero-copy {
-  font-size: clamp(2rem, 5.2vw, 6rem);
-  line-height: 0.95;
-  color: rgba(236, 239, 244, 0.42);
+main .intro .main-text {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
 }
-main .hero-copy p {
-  margin: 0 0 0.4em;
-  font-weight: inherit;
+main .intro p {
+  margin: 0;
+  max-width: 60ch;
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  line-height: 1.55;
+  color: rgba(236, 239, 244, 0.64);
 }
-main .hero-copy p:last-child {
-  margin-bottom: 0;
-}
-main .hero-copy p:first-child {
-  color: #ECEFF4;
-}
-main .hero-copy p + p {
-  font-size: 0.55em;
-  line-height: 1.05;
-}
-main .hero-copy em {
+main .intro em {
   font-style: normal;
+  font-weight: 700;
   color: #88C0D0;
-}
-.js main .hero-copy {
-  flex: 1 1 0;
-  min-height: 0;
-  overflow: hidden;
 }
 main .intro-para {
   display: grid;
@@ -418,7 +411,7 @@ main .intro-para {
   column-gap: clamp(2rem, 5vw, 5rem);
   row-gap: clamp(2.5rem, 6vh, 4rem);
   align-items: end;
-  margin-bottom: clamp(2rem, 6vh, 4rem);
+  margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
   padding-bottom: clamp(1.5rem, 4vh, 2.5rem);
   border-bottom: 2px solid #ECEFF4;
 }
@@ -517,17 +510,18 @@ main .first-page-blog li a:hover > .arrow {
   transform: translateX(8px);
 }
 main .second-page {
-  padding-top: 0;
+  padding-top: clamp(2.5rem, 6vh, 4rem);
 }
 main .second-page h2 {
-  margin: 0 0 clamp(1.5rem, 4vh, 3rem);
+  margin: 0 0 clamp(1rem, 2.5vh, 1.75rem);
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
   color: #ECEFF4;
 }
 main .second-page .projects {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  grid-auto-rows: minmax(220px, auto);
+  grid-auto-rows: minmax(150px, auto);
 }
 main .second-page .projects > div {
   grid-column: span 2;
@@ -554,7 +548,7 @@ main .second-page .projects .turtlebot .card h3, main .second-page .projects .oc
 main .second-page .projects .turtlebot .card > div::before, main .second-page .projects .octane .card > div::before {
   content: "";
   position: absolute;
-  inset: -100vh -1.75rem -1.75rem;
+  inset: -100vh -1.25rem -1.25rem;
   z-index: -1;
   background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.85) 70%);
   transition: opacity 0.4s cubic-bezier(0.2, 0, 0, 1);
@@ -569,6 +563,9 @@ main .second-page .projects .turtlebot .card {
 @media (min-width: 941px) {
   main .second-page .projects .co-chat {
     grid-column: span 4;
+  }
+  main .second-page .projects .wasm-zero {
+    grid-column: span 3;
   }
 }
 main .second-page .projects .octane .card {
@@ -585,7 +582,7 @@ main .second-page .projects .octane .card {
   main .second-page .projects .turtlebot, main .second-page .projects .octane {
     grid-column: span 2;
     grid-row: span 1;
-    min-height: 340px;
+    min-height: 240px;
   }
 }
 @media (max-width: 600px) {
@@ -598,7 +595,7 @@ main .second-page .projects .octane .card {
 }
 main .second-page .card {
   height: 100%;
-  padding: 1.75rem;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
   background: #ECEFF4;
@@ -628,7 +625,7 @@ main .second-page .card br {
   display: none;
 }
 main .second-page .card h1 {
-  font-size: clamp(1.9rem, 3.2vw, 3rem);
+  font-size: clamp(1.35rem, 2vw, 1.85rem);
   line-height: 0.95;
   overflow-wrap: anywhere;
 }
@@ -638,7 +635,7 @@ main .second-page .card h1 a {
 main .second-page .card h1 a::before {
   content: "";
   position: absolute;
-  inset: -1.75rem;
+  inset: -1.25rem;
   z-index: 3;
 }
 main .second-page .card h1 a::after {
@@ -653,12 +650,25 @@ main .second-page .card h1 a::after {
 main .second-page .card h3 {
   display: block;
   margin-top: auto;
-  padding-top: 1.25rem;
+  padding-top: 0.75rem;
   font-weight: 500;
-  font-size: 1rem;
+  font-size: 0.9rem;
   line-height: 1.45;
   color: rgba(46, 52, 64, 0.72);
   transition: color 0.35s cubic-bezier(0.2, 0, 0, 1);
+}
+main .second-page .card .card-meta {
+  margin: 0.75rem 0 0;
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #4C566A;
+  transition: color 0.35s cubic-bezier(0.2, 0, 0, 1);
+}
+main .second-page .card:hover .card-meta {
+  color: #2E3440;
 }
 main .second-page .turtlebot .card,
 main .second-page .octane .card {

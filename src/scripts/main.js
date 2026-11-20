@@ -73,53 +73,6 @@ if ('IntersectionObserver' in window) {
   reveals.forEach((el) => el.classList.add('is-visible'));
 }
 
-// Stretch headline lines so each one spans the full content width
-const fits = document.querySelectorAll('.fit');
-
-const fitText = () => {
-  fits.forEach((el) => {
-    const available = el.parentElement.clientWidth;
-    el.style.fontSize = '100px';
-    const natural = el.getBoundingClientRect().width;
-    if (natural > 0) {
-      // Small trim so glyph overhang never pokes past the gutter
-      el.style.fontSize = `${(available / natural) * 98.5}px`;
-    }
-  });
-};
-
-// Grow the hero copy to the largest size that still fits the space left on screen
-const heroCopy = document.querySelector('.hero-copy');
-
-const fillHero = () => {
-  if (!heroCopy) return;
-  let lo = 16;
-  let hi = 400;
-  while (hi - lo > 0.5) {
-    const mid = (lo + hi) / 2;
-    heroCopy.style.fontSize = `${mid}px`;
-    const inBounds =
-      heroCopy.scrollHeight <= heroCopy.clientHeight &&
-      heroCopy.scrollWidth <= heroCopy.clientWidth;
-    if (inBounds) lo = mid;
-    else hi = mid;
-  }
-  heroCopy.style.fontSize = `${lo}px`;
-};
-
-const layout = () => {
-  fitText();
-  fillHero();
-};
-
-if (fits.length || heroCopy) {
-  layout();
-  window.addEventListener('resize', layout);
-  if (document.fonts) {
-    document.fonts.ready.then(layout);
-  }
-}
-
 // Material ripple on interactive surfaces
 const rippleTargets = document.querySelectorAll(
   'header .center-part a, .links a, .first-page-blog li a, .projects .card',

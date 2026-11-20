@@ -52,6 +52,19 @@ header {
 		@include media-query($bp-1) {
 			a { padding: 0 0.75rem; font-size: 0.85rem; }
 		}
+
+		@include media-query(480px) {
+			a { padding: 0 0.5rem; font-size: 0.78rem; letter-spacing: 0.02em; }
+		}
+	}
+
+	@include media-query(480px) {
+		.parent { gap: 0.75rem; }
+	}
+
+	// Smallest phones: drop the clock so all four nav links fit
+	@include media-query(359px) {
+		.right-part { display: none; }
 	}
 
 	.right-part p {

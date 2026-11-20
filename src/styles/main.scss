@@ -135,15 +135,6 @@ body {
   clip-path: inset(0 -100vmax);
 }
 
-// Headlines sized by main.js to span the full width; vw value is the no-JS fallback
-.fit {
-  display: block;
-  width: max-content;
-  max-width: none;
-  white-space: nowrap;
-  font-size: min(17vw, 15rem);
-}
-
 .main-text {
   @extend %display;
   margin: 0;
